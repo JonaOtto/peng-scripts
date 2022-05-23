@@ -1,2 +1,2 @@
 # peng-scripts
-Scripts for performance engeneering course at TU Darmstadt.
+Scripts for performance engineering course at TU Darmstadt.
