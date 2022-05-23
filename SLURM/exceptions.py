@@ -27,3 +27,15 @@ class ScriptNotFoundException(SlurmBaseException):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+class CommandExecutionException(SlurmBaseException):
+    """
+    Exception for execution of commands.
+    """
+
+    def __init__(self, command, invalid=False, non_zero=True):
+        if invalid:
+            super().__init__(f"Error while command execution of '{command}': Command not found.")
+        elif non_zero:
+            super().__init__(f"Error while command execution of '{command}': Returned non-zero exit code.")

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from typing import Optional, List
 
-from SLURM.exceptions import ModuleDependencyConflict, ScriptNotFoundException
+from SLURM.exceptions import ModuleDependencyConflict, ScriptNotFoundException, CommandExecutionException
 
 
 class MailType:
@@ -82,8 +83,10 @@ class SlurmConfiguration:
         Constructor.
         :param slurm_script_file: The file to save the SLURM script.
         :param job_name: Job name, -J or --job-name setting.
-        :param std_out_path: Path to put the stdout of the job, -o or --out setting.
-        :param std_err_path: Path to put the stderr of the job, -e or --err setting.
+        :param std_out_path: Path to put the stdout of the job, -o or --out setting. Give the absolute file path.
+        The job id will be added at the back automatically.
+        :param std_err_path: Path to put the stderr of the job, -e or --err setting. Give the absolute file path.
+        The job id will be added at the back automatically.
         :param time_str: Time limit for the job, --time or -t setting. Give string in ‘mm’, ‘mm:ss’ or ‘hh:mm:ss’
         :param mem_per_cpu: Memory per thread, the --mem-per-cpu setting.
         :param number_of_cores: Number of cores/individual processing units you want, the -n or --ntasks setting.
@@ -118,7 +121,7 @@ class SlurmConfiguration:
         self.__slurm_script_file = slurm_script_file
         self.__job_name = job_name
         self.__std_out_path = std_out_path
-        self.__str_err_path = std_err_path
+        self.__std_err_path = std_err_path
         self.__time_str = time_str
         self.__mem_per_cpu = mem_per_cpu
         self.__number_of_cores = number_of_cores
@@ -348,8 +351,8 @@ class SlurmConfiguration:
 
                 f.write("### Job information:\n")
                 f.write(f"#SBATCH --job-name='{self.__job_name}'\n")
-                f.write(f"#SBATCH --error={self.__str_err_path}\n")
-                f.write(f"#SBATCH --output={self.__std_out_path}\n")
+                f.write(f"#SBATCH --error={self.__std_err_path}.%j\n")
+                f.write(f"#SBATCH --output={self.__std_out_path}.%j\n")
                 f.write(f"#SBATCH --time={self.__time_str}\n")
                 if self.__dependencies:
                     for dependency in self.__dependencies:
@@ -398,20 +401,35 @@ class SlurmConfiguration:
         Synchron version: It will just submit the job, you have to care about everything else.
         :return:
         """
-        # check dirs
-        pass
+        # check dirs: Just check for dirs, file may not be there, but slurm will create it
+        # as long as the directory is in place
+        err_dir = "/".join(self.__std_err_path.split("/")[:-1])
+        out_dir = "/".join(self.__std_out_path.split("/")[:-1])
+        if not os.path.isdir(err_dir):
+            res = subprocess.run(["mkdir", "-p", err_dir])
+            if not res.returncode == 0:
+                raise CommandExecutionException(f"mkdir -p {err_dir}")
+        if not os.path.isdir(out_dir):
+            res = subprocess.run(["mkdir", "-p", out_dir])
+            if not res.returncode == 0:
+                raise CommandExecutionException(f"mkdir -p {out_dir}")
 
         # write script
         self.__write_slurm_script()
 
         # sbatch it
-        pass
+        try:
+            res = subprocess.run(["sbatch", self.__slurm_script_file])
+            if res.returncode != 0:
+                raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
+        except FileNotFoundError:
+            raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)
 
     async def sbatch_async(self):
         """
         Saves the SLURM script to the file and submits the job on the system via "sbatch"-command.
         Async version: You can await this call, to the SLURM job to finish execution.
-        It will return the paths to the result files of the job.
-        :return:
+        :return: It will return the paths to the result files of the job.
         """
+        # TODO: Implement. How?
         pass
