@@ -65,7 +65,7 @@ class SlurmConfiguration:
                  std_out_path: str, std_err_path: str,
                  time_str: str,
                  mem_per_cpu: int,
-                 number_of_cores: int, number_of_threads: int,
+                 number_of_tasks: int, number_of_cores_per_task: int,
                  cpu_frequency_str: Optional[str] = None,
                  partition: Optional[str] = None, reservation: Optional[str] = None, account: Optional[str] = None,
                  job_array_start: Optional[int] = None, job_array_end: Optional[int] = None, job_array_step: int = 1,
@@ -89,9 +89,9 @@ class SlurmConfiguration:
         The job id will be added at the back automatically.
         :param time_str: Time limit for the job, --time or -t setting. Give string in ‘mm’, ‘mm:ss’ or ‘hh:mm:ss’
         :param mem_per_cpu: Memory per thread, the --mem-per-cpu setting.
-        :param number_of_cores: Number of cores/individual processing units you want, the -n or --ntasks setting.
+        :param number_of_tasks: Number of cores/individual processing units you want, the -n or --ntasks setting.
         E.g. important for MPI.
-        :param number_of_threads: Number of threads per process you want, the --cpus-per-task or -c setting.
+        :param number_of_cores_per_task: Number of threads per process you want, the --cpus-per-task or -c setting.
         :param cpu_frequency_str: Set this to ensure the processors run on equal speeds
         (disables all fancy overclocking, hyperboots, ... features), the --cpu-freq setting.
         Do not specify if you do not want a fixed cpu speed. Default: None.
@@ -124,8 +124,8 @@ class SlurmConfiguration:
         self.__std_err_path = std_err_path
         self.__time_str = time_str
         self.__mem_per_cpu = mem_per_cpu
-        self.__number_of_cores = number_of_cores
-        self.__number_of_threads = number_of_threads
+        self.__number_of_tasks = number_of_tasks
+        self.__number_of_cores_per_task = number_of_cores_per_task
         self.__cpu_frequency_str = cpu_frequency_str
         self.__partition = partition
         self.__reservation = reservation
@@ -366,9 +366,9 @@ class SlurmConfiguration:
                     f.write("### No mail settings were specified.\n")
 
                 f.write("\n### Compute settings:\n")
-                f.write(f"#SBATCH --mem-per-cpu={self.__mail_address}\n")
-                f.write(f"#SBATCH --ntasks={self.__number_of_threads}\n")
-                f.write(f"#SBATCH --cpus-per-task={self.__number_of_cores}\n")
+                f.write(f"#SBATCH --mem-per-cpu={self.__mem_per_cpu}\n")
+                f.write(f"#SBATCH --ntasks={self.__number_of_cores_per_task}\n")
+                f.write(f"#SBATCH --cpus-per-task={self.__number_of_tasks}\n")
                 if self.__exclusive:
                     f.write("#SBATCH --exclusive\n")
                 f.write(f"#SBATCH --cpu-freq={self.__cpu_frequency_str}\n")
