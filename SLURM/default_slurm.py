@@ -4,16 +4,23 @@ from SLURM.slurm import SlurmConfiguration, MailType
 class DefaultPEngSlurmConfig(SlurmConfiguration):
     """Holds the default SLURM job for the PEng seminar. All the paths will be derived from the job name."""
 
-    def __init__(self, job_name: str, output_directory: str, job_file_directory: str):
+    def __init__(self,
+                 job_name: str,
+                 output_directory: str = "/work/scratch/kurse/kurs00054/jo83xafu",
+                 job_file_directory: str = "/home/kurse/kurs00054/jo83xafu/jobfiles"):
         """
         Constructor.
+        :param job_name: The jobs name. Use the job name wisely: Give info about the run, everything will be constructed upon this.
+        Think about later processing!
         :param output_directory: The directory the std out- and err files goes in. Give without trailing slash.
+        Defaults to my $HPC_SCRATCH. The job name will be added as an sub-directory.
         :param job_file_directory: The directory the job file goes in. Give without trailing slash.
+        Defaults to: /home/kurse/kurs00054/jo83xafu/jobfiles.
         """
         # Manage file names:
         slurm_script_file = f"{job_file_directory}/JOB_{job_name}"
-        std_out_path = f"{output_directory}/OUT_{job_name}"
-        std_err_path = f"{output_directory}/ERR_{job_name}"
+        std_out_path = f"{output_directory}/{job_name}/OUT_{job_name}"
+        std_err_path = f"{output_directory}/{job_name}/ERR_{job_name}"
 
         # construct it
         super().__init__(slurm_script_file=slurm_script_file,
