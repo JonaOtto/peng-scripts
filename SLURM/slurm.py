@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import time
 from typing import Optional, List
 
 from SLURM.exceptions import ModuleDependencyConflict, ScriptNotFoundException, CommandExecutionException
@@ -292,7 +293,7 @@ class SlurmConfiguration:
                                                f"Modules that cannot be sorted in are: {conflicts_on}.")
         self.__modules = modules_sorted
 
-    def __write_slurm_script(self) -> None:
+    def write_slurm_script(self) -> None:
         """
         Saves the SLURM script to the specified location.
         This will also check the stdout and stderr directories if set, and add the helper echo commands if set.
@@ -351,9 +352,15 @@ class SlurmConfiguration:
 
                 f.write("### Job information:\n")
                 f.write(f"#SBATCH --job-name='{self.__job_name}'\n")
-                f.write(f"#SBATCH --error={self.__std_err_path}.%j\n")
-                f.write(f"#SBATCH --output={self.__std_out_path}.%j\n")
+                if self.__job_array:
+                    f.write(f"#SBATCH --error={self.__std_err_path}.%A_%a\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}.%A_%a\n")
+                else:
+                    f.write(f"#SBATCH --error={self.__std_err_path}.%j\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}.%j\n")
                 f.write(f"#SBATCH --time={self.__time_str}\n")
+                # TODO Add job array! If job-array is in place, name the out and err files with the id?
+
                 if self.__dependencies:
                     for dependency in self.__dependencies:
                         f.write(f"#SBATCH --dependency={dependency}\n")
@@ -395,11 +402,11 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self):
+    def sbatch(self) -> int:
         """
         Saves the SLURM script to the file and submits the job on the system via "sbatch"-command.
         Synchron version: It will just submit the job, you have to care about everything else.
-        :return:
+        :return: The job id.
         """
         # check dirs: Just check for dirs, file may not be there, but slurm will create it
         # as long as the directory is in place
@@ -414,22 +421,38 @@ class SlurmConfiguration:
             if not res.returncode == 0:
                 raise CommandExecutionException(f"mkdir -p {out_dir}")
 
-        # write script
-        self.__write_slurm_script()
-
         # sbatch it
         try:
-            res = subprocess.run(["sbatch", self.__slurm_script_file])
+            res = subprocess.run(["sbatch", self.__slurm_script_file], stdout=subprocess.PIPE)
             if res.returncode != 0:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
+            res = res.stdout.decode("utf-8")
+            res = res.splitlines()[0].split("batch job ")[1]
+            res = int(res.split(" ")[0])
+            return res
         except FileNotFoundError:
             raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)
 
-    async def sbatch_async(self):
+    def __check_squeue(self, job_id: int) -> bool:
         """
-        Saves the SLURM script to the file and submits the job on the system via "sbatch"-command.
-        Async version: You can await this call, to the SLURM job to finish execution.
+        Checks the output of the "squeue" command and returns whether job with that id is completed or not.
+        :param job_id: The job id to find status for.
+        :return: True if job is completed, false otherwise.
+        """
+        # example squeue output
+        #      JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMIT PRIORITY    NODES NODELIST(REASON)
+        #   28712165 kurs00054 JOB_ISSM jo83xafu  RUNNING       0:24      15:00 13054           1 mpsc0154
+        res = subprocess.run(["squeue", "|", "grep", str(job_id)], stdout=subprocess.PIPE)
+        if res.stdout.decode("utf-8") != "":
+            return True
+        else:
+            return False
+
+    def wait(self, job_id):
+        """
+        Wait for the SLURM job to finish execution.
         :return: It will return the paths to the result files of the job.
         """
-        # TODO: Implement. How?
-        pass
+        while not self.__check_squeue(job_id):
+            time.sleep(60)
+        return self.__std_out_path, self.__std_err_path
