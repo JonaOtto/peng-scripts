@@ -39,7 +39,7 @@ class BasicBuilder:
         old_dir = os.getcwd()
         os.chdir(self.home_dir+"/issm-build-scripts/install/")
         # Step 2: run "./issm-build.sh PATH_TO_SOURCE"
-        subprocess.run(["./issm-build.sh", self.home_dir+"/"+self.source_path])
+        subprocess.run(["./issm-build.sh", self.home_dir+"/"+self.source_path], shell=True, executable="/bin/bash")
         # cd back to old dir
         os.chdir(old_dir)
 

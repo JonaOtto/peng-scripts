@@ -429,7 +429,7 @@ class SlurmConfiguration:
 
         # sbatch it
         try:
-            res = subprocess.run(["sbatch", self.__slurm_script_file+".sh"], stdout=subprocess.PIPE)
+            res = subprocess.run(["sbatch", self.__slurm_script_file+".sh"], stdout=subprocess.PIPE, shell=True, executable="/bin/bash")
             if res.returncode != 0:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
             res = res.stdout.decode("utf-8")
