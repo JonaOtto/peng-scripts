@@ -40,7 +40,7 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
                          shell="/bin/bash",
                          uses_module_system=False,
                          purge_modules_at_start=False,
-                         mail_types=[MailType.END],
+                         # mail_types=[MailType.END],
                          mail_address="jonathan.otto.37@stud.tu-darmstadt.de",
                          echo_job_task_info=True,
                          check_dirs_to_out=True,
@@ -52,6 +52,6 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
         #super().add_module(name="clang", version="#", depends_on=["gcc/#"])
         #super().add_module(name="cmake", depends_on=["gcc/#"])
 
-        # Commands - actrual execution will be added later
+        # Commands - actual execution will be added later
         super().add_command("FOLDER=$(basename $PWD)")
         #super().add_command("mpirun -n 96 $ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER")

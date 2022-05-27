@@ -1,4 +1,4 @@
-from __future__ import annotations
+# from __future__ import annotations
 
 import os
 import subprocess
@@ -35,7 +35,7 @@ class _Module:
         self.version = version
         self.depends_on = depends_on
 
-    def check_dependency_conflicts(self, other_modules: List[_Module]) -> None:
+    def check_dependency_conflicts(self, other_modules) -> None:
         """
         Checks if there are circular conflicts in dependencies.
         :param other_modules: List of other modules to check with.
@@ -201,6 +201,12 @@ class SlurmConfiguration:
         if start is not None and end is not None:
             self.__job_array = str(start) + "-" + str(end) + "%" + str(step)
 
+    def get_slurm_file_path(self):
+        """
+        Getter for slurm script path.
+        """
+        return self.__slurm_script_file
+
     def add_module(self, name: str, version: str = None, depends_on: Optional[List[str]] = None):
         """
         Adds a module to be load from the module system. If this module (same name) was already added, this will
@@ -312,7 +318,7 @@ class SlurmConfiguration:
             self.__commands.insert(0, "echo '[SlurmConfiguration] STARTING.'")
             self.__commands.append("echo '[SlurmConfiguration] FINISHED.'")
         try:
-            with open(self.__slurm_script_file, "w") as f:
+            with open(self.__slurm_script_file+".sh", "w") as f:
 
                 # write header
                 f.write(f"#!{self.__shell}\n\n")
@@ -423,7 +429,7 @@ class SlurmConfiguration:
 
         # sbatch it
         try:
-            res = subprocess.run(["sbatch", self.__slurm_script_file], stdout=subprocess.PIPE)
+            res = subprocess.run(["sbatch", self.__slurm_script_file+".sh"], stdout=subprocess.PIPE)
             if res.returncode != 0:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
             res = res.stdout.decode("utf-8")
@@ -442,7 +448,8 @@ class SlurmConfiguration:
         # example squeue output
         #      JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMIT PRIORITY    NODES NODELIST(REASON)
         #   28712165 kurs00054 JOB_ISSM jo83xafu  RUNNING       0:24      15:00 13054           1 mpsc0154
-        res = subprocess.run(["squeue", "|", "grep", str(job_id)], stdout=subprocess.PIPE)
+        sq = subprocess.Popen(["squeue"], stdout=subprocess.PIPE)
+        res = subprocess.run(["grep", str(job_id)], stdin=sq.stdout, stdout=subprocess.PIPE)
         if res.stdout.decode("utf-8") != "":
             return True
         else:
