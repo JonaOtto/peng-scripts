@@ -132,7 +132,7 @@ class BaseRun:
         print(self.execution_command)
         res = "Submitted batch job 22919824 asdasda"
         # get job id from res:
-        res = res.stdout.decode("utf-8")
+        #res = res.stdout.decode("utf-8")
         res = res.split("Submitted batch job")[1]
         job_id = int(res.split(" ")[1])
         print(f"\n\n\nJob ID: {job_id}\n\n\n")
