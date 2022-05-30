@@ -117,6 +117,8 @@ class BaseRun:
                     self.builder.build(active=True)
                 except CommandExecutionException as e:
                     raise RuntimeError(e)
+                # If we build actively, we can clean up now,
+                # otherwise the build command not run yet, do it in the cleanup method.
                 self.builder.cleanup_build()
             else:
                 self.__add_execution_command(self.builder.build(active=False))
@@ -183,6 +185,8 @@ class BaseRun:
             os.remove(f"{self.home_dir}/{executable_path[self.app]}")  # the executable
             os.remove(f"{self.home_dir}/{folder}/issm-load.sh")  # issm-load.sh
             os.remove(f"{self.home_dir}/{folder}/issmModule.lua")  # issmMoudle.lua
+        if not is_active["build"]:
+            self.builder.cleanup_build()
 
     def analyze(self):
         """
@@ -234,4 +238,3 @@ class GProfRun(BaseRun):
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = self.slurm_configuration.get_out_dir()+file_name
         self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")
-        #super().pipe_run_command(to_file_path=self.slurm_configuration.get_out_dir()+file_name)

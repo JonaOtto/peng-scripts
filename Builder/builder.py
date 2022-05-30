@@ -111,8 +111,7 @@ class BaseBuilder:
         with open("env-build.sh", "w") as envbuildsh:
             for line in lines:
                 envbuildsh.write(f"{line}\n")
-
-        raise RuntimeError()
+        os.chdir(old_dir)
 
     def build(self, active: bool = True):
         if active:
@@ -130,7 +129,13 @@ class BaseBuilder:
             return [f"cd {self.home_dir}/issm-build-scripts/install/", f"./issm-build.sh {self.home_dir}/{self.source_path}"]
 
     def cleanup_build(self):
-        pass
+        old_dir = os.getcwd()
+        os.chdir(self.home_dir + "/issm-build-scripts/install/etc")
+        # move env-build.sh file to a backup to keep the "original"
+        subprocess.run(["mv", "env-build-BACKUP.sh", "env-build.sh"])
+        # make a copy to edit
+        subprocess.run(["rm", "env-build-BACKUP.sh"])
+        os.chdir(old_dir)
 
     def load_modules(self, active: bool = True):
         if active:
@@ -157,6 +162,6 @@ class GProfBuilder(BaseBuilder):
     """
     def __init__(self, app: App, source_path: str):
         super().__init__(app, source_path,
-                         c_compiler_flags=build_defaults["c_compiler_flags"]+" -pg",
-                         cxx_compiler_flags=build_defaults["cxx_compiler_flags"]+" -pg",
+                         c_compiler_flags=f"'{build_defaults['c_compiler_flags']} -pg'",
+                         cxx_compiler_flags=f"'{build_defaults['cxx_compiler_flags']} -pg'",
                          )
