@@ -74,15 +74,44 @@ class BaseBuilder:
         # make a copy to edit
         subprocess.run(["cp", "env-build-BACKUP.sh", "env-build.sh"])
         lines = open("env-build.sh", "r").readlines()
-        print("Compiler: ", lines[12])
-        print("GCC Version: ", lines[13])
-        print("LLVM Version: ", lines[14])
-        print("C Flags: ", lines[16])
-        print("C++ Flags: ", lines[20])
-        print("F Flags: ", lines[21])
-        print("PETSc version: ", lines[31])
-        print("ScoreP Instrumentation: ", lines[34])
-        print("ScoreP Flags: ", lines[35])
+        if self.compiler != build_defaults["compiler"]:
+            cmd, arg = lines[12].split("=")
+            if self.compiler == Compiler.GCC:
+                arg = "gcc"
+            elif self.compiler == Compiler.LLVM:
+                arg = "llvm"
+            else:
+                arg = build_defaults["compiler"]
+            lines[12] = "=".join([cmd, arg])
+        if self.gcc_version != build_defaults["gcc_version"]:
+            cmd, arg = lines[13].split("=")
+            lines[13] = "=".join([cmd, self.gcc_version])
+        if self.llvm_version != build_defaults["llvm_version"]:
+            cmd, arg = lines[14].split("=")
+            lines[14] = "=".join([cmd, self.llvm_version])
+        if self.c_compiler_flags != build_defaults["c_compiler_flags"]:
+            cmd, arg = lines[16].split("=")
+            lines[16] = "=".join([cmd, self.c_compiler_flags])
+        if self.cxx_compiler_flags != build_defaults["cxx_compiler_flags"]:
+            cmd, arg = lines[20].split("=")
+            lines[20] = "=".join([cmd, self.cxx_compiler_flags])
+        if self.fortran_compiler_flags != build_defaults["fortran_compiler_flags"]:
+            cmd, arg = lines[21].split("=")
+            lines[21] = "=".join([cmd, self.fortran_compiler_flags])
+        if self.petsc_version != build_defaults["petsc_version"]:
+            cmd, arg = lines[31].split("=")
+            lines[31] = "=".join([cmd, self.petsc_version])
+        if self.scorep_instrumentation != build_defaults["scorep_instrumentation"]:
+            cmd, arg = lines[34].split("=")
+            arg = "1" if self.scorep_instrumentation else "0"
+            lines[34] = "=".join([cmd, arg])
+        if self.scorep_flags != build_defaults["scorep_flags"]:
+            cmd, arg = lines[35].split("=")
+            lines[35] = "=".join([cmd, self.scorep_flags])
+        with open("env-build.sh", "w") as envbuildsh:
+            for line in lines:
+                envbuildsh.write(f"{line}\n")
+
         raise RuntimeError()
 
     def build(self, active: bool = True):
@@ -120,3 +149,14 @@ class BaseBuilder:
             return [""]
         else:
             return [f"cd {self.home_dir}/{self.source_path}", "source issm-load.sh"]
+
+
+class GProfBuilder(BaseBuilder):
+    """
+    Builder for GProf.
+    """
+    def __init__(self, app: App, source_path: str):
+        super().__init__(app, source_path,
+                         c_compiler_flags=build_defaults["c_compiler_flags"]+" -pg",
+                         cxx_compiler_flags=build_defaults["cxx_compiler_flags"]+" -pg",
+                         )

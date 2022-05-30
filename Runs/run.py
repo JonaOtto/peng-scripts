@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from Builder.builder import BaseBuilder, App, Resolution, Compiler
+from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
 # source and executable paths by app:
@@ -42,6 +42,7 @@ class BaseRun:
     def __init__(self,
                  app: App,
                  resolution: Resolution,
+                 builder: BaseBuilder = None,
                  compiler: Compiler = Compiler.GCC,
                  num_mpi_ranks: int = 96,
                  own_build: bool = True,
@@ -60,7 +61,9 @@ class BaseRun:
         self.cleanup_build = cleanup_build
         self.execution_command = []
         self.jobfile = None
-        self.builder = BaseBuilder(app, source_path[app])
+        self.builder = builder
+        if self.builder is None:
+            self.builder = BaseBuilder(app, source_path[app])
         # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
@@ -213,7 +216,8 @@ class GProfRun(BaseRun):
         :param gprof_out_filename: You can give a alternative file name for the gprof output.
         Otherwise, it will be based on the jobname, to adhere to the naming scheme of everything else.
         """
-        super().__init__(app, resolution, *args, **kwargs)
+        builder = GProfBuilder(app, source_path[app])
+        super().__init__(app, resolution, builder=builder, *args, **kwargs)
         """
         From tools.py:
         
