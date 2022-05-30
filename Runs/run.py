@@ -87,6 +87,12 @@ class BaseRun:
         else:
             self.execution_command = self.execution_command + "; " + command
 
+    def __print_step(self, s):
+        """
+        Prints s.
+        """
+        print(f"\n\n\n{s}\n\n\n")
+
     def prepare(self):
         """
         Builds the ISSM build.
@@ -129,13 +135,12 @@ class BaseRun:
         self.__add_execution_command(sbatch_command)
         # execute the whole thing:
         res = self.__run_execution_command()
-        print(f"\n\n\n{self.execution_command}\n\n\n")
+        self.__print_step(self.execution_command)
         # get job id from res:
         res = res.stdout.decode("utf-8")
         res = res.split("Submitted batch job")[1]
         job_id = int(res.split(" ")[1])
-        print(f"\n\n\nJob ID: {job_id}\n\n\n")
-        RuntimeError("DEBUG ENDE")
+        self.__print_step(f"Job ID: {job_id}")
         return self.slurm_configuration.wait(job_id)
 
     def cleanup(self, remove_build: bool = False):
@@ -153,8 +158,11 @@ class BaseRun:
         """
         Runs the whole run.
         """
+        self.__print_step("STARTING PREPARATION")
         self.prepare()
+        self.__print_step("STARTING RUN")
         out_path, error_path = self.run()
+        self.__print_step("STARTING CLEANUP")
         self.cleanup(remove_build=self.cleanup_build)
         return out_path, error_path
 
