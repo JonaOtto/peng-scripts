@@ -422,7 +422,7 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self, return_command: bool = False) -> Union[int, List[str]]:
+    def sbatch(self, return_command: bool = False) -> Union[int, str]:
         """
         Saves the SLURM script to the file and submits the job on the system via "sbatch"-commands.
         Synchron version: It will just submit the job, you have to care about everything else.
@@ -445,7 +445,7 @@ class SlurmConfiguration:
         # sbatch it
         sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]
         if return_command:
-            return [" ".join(sbatch_command)]
+            return " ".join(sbatch_command)
         try:
             res = subprocess.run(sbatch_command, stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
             if res.returncode != 0:
