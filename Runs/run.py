@@ -66,6 +66,12 @@ class BaseRun:
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.slurm_configuration = None
 
+    def add_tool(self, name: str):
+        """
+        Adds a tool to the naming scheme.
+        """
+        self.jobname_skeleton = f"{self.jobname_skeleton}_{name}"
+
     def prepend_run_command(self, prefix: str):
         """
         Puts something in front of the run commands.
@@ -211,7 +217,7 @@ class GProfRun(BaseRun):
         This file can be read, or viewed with the gprof GUI (https://www.ulfdittmer.com/profileviewer/).
         """
         # update the job name
-        self.jobname_skeleton = f"{self.jobname_skeleton}_GPROF"
+        self.add_tool("GPROF")
         # add gprof
         # super().prepend_run_command(prefix="gprof")
         file_name = f"{self.jobname_skeleton}_GPROF.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
