@@ -190,7 +190,7 @@ class GProfRun(BaseRun):
     A run with the tool GProf.
     """
 
-    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None):
+    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None, *args, **kwargs):
         """
         Constructor.
         :param app: The app to use.
@@ -198,7 +198,7 @@ class GProfRun(BaseRun):
         :param gprof_out_filename: You can give a alternative file name for the gprof output.
         Otherwise, it will be based on the jobname, to adhere to the naming scheme of everything else.
         """
-        super().__init__(app, resolution)
+        super().__init__(app, resolution, *args, **kwargs)
         """
         From tools.py:
         
