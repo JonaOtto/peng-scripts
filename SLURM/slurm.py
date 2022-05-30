@@ -311,7 +311,7 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Conflict while module sorting: {e}")
         if self.__echo_job_task_info:
-            self.__commands.insert(0, "echo [SlurmConfiguration] This is job ID $SLURM_ARRAY_JOB_ID")
+            self.__commands.insert(0, "echo [SlurmConfiguration] This is job ID $SLURM_JOB_ID")
             if self.__job_array:
                 self.__commands.insert(1,
                                        "echo [SlurmConfiguration] This is task  $SLURM_ARRAY_TASK_ID (configuration: " + self.__job_array + ")")
