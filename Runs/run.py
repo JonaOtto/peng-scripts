@@ -109,6 +109,7 @@ class BaseRun:
         """
         Runs the summarized commands, in ONE subprocess call.
         """
+        print(self.execution_command)
         # put step numbers in output:
         run_cmd = []
         n = 1
