@@ -110,7 +110,7 @@ class BaseBuilder:
             lines[35] = "=".join([cmd, self.scorep_flags])
         with open("env-build.sh", "w") as envbuildsh:
             for line in lines:
-                envbuildsh.write(f"{line}\n")
+                envbuildsh.write(line)
         os.chdir(old_dir)
 
     def build(self, active: bool = True):
