@@ -40,7 +40,7 @@ class BasicBuilder:
         old_dir = os.getcwd()
         os.chdir(self.home_dir+"/issm-build-scripts/install/")
         # Step 2: run "./issm-build.sh PATH_TO_SOURCE"
-        res = subprocess.run(["./issm-build.sh", f"{self.home_dir}/{self.source_path}"], shell=True, executable="/bin/bash")
+        res = subprocess.run([f"./issm-build.sh {self.home_dir}/{self.source_path}"], shell=True, executable="/bin/bash")
         if res.returncode != 0:
             raise CommandExecutionException(f"./issm-build.sh {self.home_dir}/{self.source_path}")
         # cd back to old dir
