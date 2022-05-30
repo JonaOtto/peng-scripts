@@ -128,16 +128,15 @@ class BaseRun:
         sbatch_command = self.slurm_configuration.sbatch(return_command=True)
         self.__add_execution_command(sbatch_command)
         # execute the whole thing:
-        #res = self.__run_execution_command()
-        print(self.execution_command)
-        res = "Submitted batch job 22919824 asdasda"
+        res = self.__run_execution_command()
+        print(f"\n\n\n{self.execution_command}\n\n\n")
         # get job id from res:
-        #res = res.stdout.decode("utf-8")
+        res = res.stdout.decode("utf-8")
         res = res.split("Submitted batch job")[1]
         job_id = int(res.split(" ")[1])
         print(f"\n\n\nJob ID: {job_id}\n\n\n")
         RuntimeError("DEBUG ENDE")
-        #return self.slurm_configuration.wait(job_id)
+        return self.slurm_configuration.wait(job_id)
 
     def cleanup(self, remove_build: bool = False):
         # back up job file to the OUT dir
