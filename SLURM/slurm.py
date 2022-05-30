@@ -451,7 +451,7 @@ class SlurmConfiguration:
             if res.returncode != 0:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
             res = res.stdout.decode("utf-8")
-            res = res.splitlines()[0].split("Submitted batch job")[1]
+            res = res.split("Submitted batch job")[1]
             res = int(res.split(" ")[1])
             return res
         except FileNotFoundError:

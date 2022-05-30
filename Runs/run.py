@@ -119,8 +119,11 @@ class BaseRun:
         self.execution_command = ";".join(run_cmd)
         print(self.execution_command)
 
+        # bevor executing: must be in the greenland-model dir:
+        os.chdir(f"{self.home_dir}/{model_setup_path[self.resolution]}/")
+
         res = subprocess.run(["bash", "-c", self.execution_command],
-                             #executable="/bin/bash",
+                             executable="/bin/bash",
                              #shell=True,
                              env=os.environ.copy(),
                              stdout=subprocess.PIPE)
@@ -155,6 +158,12 @@ class BaseRun:
             os.remove(f"{self.home_dir}/{folder}/issm-load.sh")  # issm-load.sh
             os.remove(f"{self.home_dir}/{folder}/issmModule.lua")  # issmMoudle.lua
 
+    def analyse(self):
+        """
+        Analyse the output.
+        """
+        print("Analysing...")
+
     def do_run(self):
         """
         Runs the whole run.
@@ -162,8 +171,10 @@ class BaseRun:
         self.prepare()
         out_path, error_path = self.run()
         self.cleanup(remove_build=self.cleanup_build)
-        print(out_path, error_path)
-        return out_path, error_path
+        print(out_path)
+        print(error_path)
+        self.analyse()
+        return
 
 
 class GProfRun(BaseRun):
