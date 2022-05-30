@@ -137,7 +137,7 @@ class BaseRun:
         job_id = int(res.split(" ")[1])
         print(f"\n\n\nJob ID: {job_id}\n\n\n")
         RuntimeError("DEBUG ENDE")
-        return self.slurm_configuration.wait(job_id)
+        #return self.slurm_configuration.wait(job_id)
 
     def cleanup(self, remove_build: bool = False):
         # back up job file to the OUT dir
