@@ -24,8 +24,6 @@ model_setup_path = {
 # mpirun -n 96 $ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER
 default_runner = "mpirun"
 default_run_command = "$ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER"
-# job file archive: will hold copies of all job files
-job_file_archive = "/home/kurse/kurs00054/jo83xafu/jobscript_archive"
 
 
 class BaseRun:
@@ -55,15 +53,16 @@ class BaseRun:
         self.jobfile = None
         self.home_dir = os.path.expanduser('~')
         self.builder = BasicBuilder(app, source_path[app])
-        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]]
+        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT/ERR/JOB]
+        self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.slurm_configuration = DefaultPEngSlurmConfig(
-            job_name=f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}",
+            job_name=self.jobname_skeleton,
             job_file_directory=self.home_dir+"/"+model_setup_path[self.resolution],
             num_mpi_ranks=num_mpi_ranks
         )
 
-    def prepend_run_command(self, prefix):
+    def prepend_run_command(self, prefix: str):
         """
         Puts something in front of the run command.
         """
@@ -96,9 +95,9 @@ class BaseRun:
         job_id = self.slurm_configuration.sbatch()
         return self.slurm_configuration.wait(job_id)
 
-    def cleanup(self, remove_build=False):
-        # back up job file to archive
-        subprocess.run(["cp", self.slurm_configuration.get_slurm_file_path() + ".sh", job_file_archive + "/"])
+    def cleanup(self, remove_build: bool = False):
+        # back up job file to the OUT dir
+        subprocess.run(["cp", self.slurm_configuration.get_slurm_file_path() + ".sh", self.slurm_configuration.get_out_dir()])
         # Clean up job file (leave model dirs clean)
         os.remove(self.slurm_configuration.get_slurm_file_path()+".sh")
         if remove_build:
@@ -113,5 +112,33 @@ class BaseRun:
         """
         self.prepare()
         out_path, error_path = self.run()
-        self.cleanup(self.cleanup_build)
+        self.cleanup(remove_build=self.cleanup_build)
         return out_path, error_path
+
+
+class GProfRun(BaseRun):
+    """
+    A run with the tool GProf.
+    """
+
+    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None):
+        """
+        Constructor.
+        :param app: The app to use.
+        :param resolution: The resolution to use.
+        :param gprof_out_filename: You can give a alternative file name for the gprof output.
+        Otherwise, it will be based on the jobname, to adhere to the naming scheme of everything else.
+        """
+        super().__init__(app, resolution)
+        """
+        From tools.py:
+        
+        ### GProf ###
+        Hotspot detection with timings and everything. Also call graph inspections. 
+        Uses a mixture of instrumentation and sampling.
+        Usage: gprof BIN_NAME > gprof.profile, will pipe a GProf profile into specified file. 
+        This file can be read, or viewed with the gprof GUI (https://www.ulfdittmer.com/profileviewer/).
+        """
+        super().prepend_run_command(prefix="gprof")
+        file_name = f"{self.jobname_skeleton}_GPROF.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
+        super().pipe_run_command(to_file_path=self.slurm_configuration.get_out_dir()+file_name)
