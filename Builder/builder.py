@@ -36,16 +36,17 @@ class BasicBuilder:
         self.home_dir = os.path.expanduser('~')
 
     def build(self):
-        # # Step 1: cd into the issm-build/install/ dir
-        # old_dir = os.getcwd()
-        # os.chdir(self.home_dir+"/issm-build-scripts/install/")
-        # # Step 2: run "./issm-build.sh PATH_TO_SOURCE"
-        # res = subprocess.run([f"./issm-build.sh {self.home_dir}/{self.source_path}"], shell=True, executable="/bin/bash", env=os.environ.copy())
-        # if res.returncode != 0:
-        #     raise CommandExecutionException(f"./issm-build.sh {self.home_dir}/{self.source_path}")
-        # # cd back to old dir
-        # os.chdir(old_dir)
-        return [f"cd {self.home_dir}/issm-build-scripts/install/", f"./issm-build.sh {self.home_dir}/{self.source_path}"]
+        # Step 1: cd into the issm-build/install/ dir
+        old_dir = os.getcwd()
+        os.chdir(self.home_dir+"/issm-build-scripts/install/")
+        # Step 2: run "./issm-build.sh PATH_TO_SOURCE"
+        res = subprocess.run([f"./issm-build.sh {self.home_dir}/{self.source_path}"], shell=True, executable="/bin/bash", env=os.environ.copy())
+        if res.returncode != 0:
+            raise CommandExecutionException(f"./issm-build.sh {self.home_dir}/{self.source_path}")
+        # cd back to old dir
+        os.chdir(old_dir)
+        return [""]
+        # return [f"cd {self.home_dir}/issm-build-scripts/install/", f"./issm-build.sh {self.home_dir}/{self.source_path}"]
 
     def load_modules(self):
         # # Step 1: cd into the source_dir, there will now be a "issm-load.sh"
