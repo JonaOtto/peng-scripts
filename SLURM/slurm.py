@@ -46,11 +46,13 @@ class _Module:
                 for compare_module in other_modules:
                     # if compare module in general is a dependency, or the compare module in its version.
                     if compare_module.name == dependency or \
-                            (compare_module.version is not None and compare_module.name + "/" + compare_module.version == dependency):
+                            (
+                                    compare_module.version is not None and compare_module.name + "/" + compare_module.version == dependency):
                         if compare_module.depends_on:
                             # if either general module or module with version depends back on this module
                             if self.name in compare_module.depends_on or \
-                                    (self.version is not None and self.name+"/"+self.version in compare_module.depends_on):
+                                    (
+                                            self.version is not None and self.name + "/" + self.version in compare_module.depends_on):
                                 raise ModuleDependencyConflict(f"Dependency conflict: Module {self.name} depends on "
                                                                f"{dependency}, but {compare_module.name} "
                                                                f"depends on {self.name}.")
@@ -214,9 +216,9 @@ class SlurmConfiguration:
         :return : The directory of the std out or err file, depending on the out parameter.
         """
         if out:
-            return "/".join(self.__std_out_path.split("/")[:-1])+"/"
+            return "/".join(self.__std_out_path.split("/")[:-1]) + "/"
         else:
-            return "/".join(self.__std_err_path.split("/")[:-1])+"/"
+            return "/".join(self.__std_err_path.split("/")[:-1]) + "/"
 
     def add_module(self, name: str, version: str = None, depends_on: Optional[List[str]] = None) -> None:
         """
@@ -294,7 +296,8 @@ class SlurmConfiguration:
             dependencies_fulfilled = True
             for dependency in module.depends_on:
                 if dependency not in [mod.name for mod in modules_sorted] and \
-                        dependency not in [mod.name+"/"+mod.version if mod.version is not None else "NO_VERSION" for mod in modules_sorted]:
+                        dependency not in [mod.name + "/" + mod.version if mod.version is not None else "NO_VERSION" for
+                                           mod in modules_sorted]:
                     dependencies_fulfilled = False
                     # put it back at the end of the list, to check later
                     modules_with_deps.append(module)
@@ -329,7 +332,7 @@ class SlurmConfiguration:
             self.__commands.insert(0, "echo '[SlurmConfiguration] STARTING.'")
             self.__commands.append("echo '[SlurmConfiguration] FINISHED.'")
         try:
-            with open(self.__slurm_script_file+".sh", "w") as f:
+            with open(self.__slurm_script_file + ".sh", "w") as f:
 
                 # write header
                 f.write(f"#!{self.__shell}\n\n")
@@ -419,11 +422,12 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self) -> int:
+    def sbatch(self, return_command: bool = False) -> int | str:
         """
         Saves the SLURM script to the file and submits the job on the system via "sbatch"-command.
         Synchron version: It will just submit the job, you have to care about everything else.
-        :return: The job id.
+        :param return_command: Do not run the command, just return it.
+        :return: The job id. Or if return_command set: The sbatch command.
         """
         # check dirs: Just check for dirs, file may not be there, but slurm will create it
         # as long as the directory is in place
@@ -439,13 +443,16 @@ class SlurmConfiguration:
                 raise CommandExecutionException(f"mkdir -p {out_dir}")
 
         # sbatch it
+        sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]
+        if return_command:
+            return " ".join(sbatch_command)
         try:
-            res = subprocess.run(["sbatch", self.__slurm_script_file+".sh"], stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
+            res = subprocess.run(sbatch_command, stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
             if res.returncode != 0:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
             res = res.stdout.decode("utf-8")
-            res = res.splitlines()[0].split("batch job ")[1]
-            res = int(res.split(" ")[0])
+            res = res.splitlines()[0].split("Submitted batch job")[1]
+            res = int(res.split(" ")[1])
             return res
         except FileNotFoundError:
             raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)

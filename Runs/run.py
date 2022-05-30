@@ -52,6 +52,7 @@ class BaseRun:
         self.runner = runner
         self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {run_command}"
         self.cleanup_build = cleanup_build
+        self.execution_command = ""
         self.jobfile = None
         self.home_dir = os.path.expanduser('~')
         self.builder = BasicBuilder(app, source_path[app])
@@ -77,30 +78,65 @@ class BaseRun:
         pipe_sign = ">" if triangle_pipe else "|"
         self.run_command = f"{self.run_command} {pipe_sign} {to_file_path}"
 
+    def __add_execution_command(self, command):
+        """
+        Adds a command to add to execution. Helper: Everything must be in ONE subprocess call, otherwise it messes up env vars.
+        """
+        if self.execution_command == "":
+            self.execution_command = command
+        else:
+            self.execution_command = self.execution_command + "; " + command
+
     def prepare(self):
         """
         Builds the ISSM build.
         """
         if self.own_build:
             # TODO maybe do additional ENV loading here
-            try:
-                self.builder.build()
-            except CommandExecutionException as e:
-                raise RuntimeError(e)
+            # try:
+            #     self.builder.build()
+            # except CommandExecutionException as e:
+            #     raise RuntimeError(e)
+            self.__add_execution_command(self.builder.build())
             # TODO maybe do additional Module loading here
-            try:
-                self.builder.load_modules()
-            except CommandExecutionException as e:
-                raise RuntimeError(e)
+            # try:
+            #     self.builder.load_modules()
+            # except CommandExecutionException as e:
+            #     raise RuntimeError(e)
+            self.__add_execution_command(self.builder.load_modules())
         # generate job_script:
         self.slurm_configuration.add_command(self.run_command)
         self.slurm_configuration.write_slurm_script()
+
+    def __run_execution_command(self):
+        """
+        Runs the summarized command, in ONE subprocess call.
+        """
+        res = subprocess.run(["bash", "-c", self.execution_command],
+                             executable="/bin/bash",
+                             shell=True,
+                             env=os.environ.copy(),
+                             stdout=subprocess.PIPE)
+        if res.returncode != 0:
+            raise CommandExecutionException(self.execution_command)
+        return res
 
     def run(self):
         """
         Runs the build.
         """
-        job_id = self.slurm_configuration.sbatch()
+        sbatch_command = self.slurm_configuration.sbatch(return_command=True)
+        self.__add_execution_command(sbatch_command)
+        # execute the whole thing:
+        #res = self.__run_execution_command()
+        print(self.execution_command)
+        res = "Submitted batch job 22919824 asdasda"
+        # get job id from res:
+        res = res.stdout.decode("utf-8")
+        res = res.split("Submitted batch job")[1]
+        job_id = int(res.split(" ")[1])
+        print(f"\n\n\nJob ID: {job_id}\n\n\n")
+        RuntimeError("DEBUG ENDE")
         return self.slurm_configuration.wait(job_id)
 
     def cleanup(self, remove_build: bool = False):
