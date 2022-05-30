@@ -113,10 +113,11 @@ class BaseRun:
         run_cmd = []
         n = 1
         for cmd in self.execution_command:
-            run_cmd.append(cmd)
             run_cmd.append(f"echo '####################### Step {n} #######################'")
+            run_cmd.append(cmd)
             n = n + 1
         self.execution_command = ";".join(run_cmd)[1:]
+        print(self.execution_command)
 
         res = subprocess.run(["bash", "-c", self.execution_command],
                              #executable="/bin/bash",
@@ -132,12 +133,13 @@ class BaseRun:
         Runs the build.
         """
         sbatch_command = self.slurm_configuration.sbatch(return_command=True)
+        print("Sbatch command: ", sbatch_command)
         self.__add_execution_command(sbatch_command)
         # execute the whole thing:
         res = self.__run_execution_command()
         # get job id from res:
         res = res.stdout.decode("utf-8")
-        print(res)
+        print("Result: ", res)
         res = res.split("Submitted batch job")[1]
         job_id = int(res.split(" ")[1].split("\n")[0])
         return self.slurm_configuration.wait(job_id)
