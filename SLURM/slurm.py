@@ -370,8 +370,8 @@ class SlurmConfiguration:
                 f.write("### Job information:\n")
                 f.write(f"#SBATCH --job-name='{self.__job_name}'\n")
                 if self.__job_array:
-                    f.write(f"#SBATCH --error={self.__std_err_path}.%A_%a\n")
-                    f.write(f"#SBATCH --output={self.__std_out_path}.%A_%a\n")
+                    f.write(f"#SBATCH --error={self.__std_err_path}_%A_%a.err\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}_%A_%a.out\n")
                 else:
                     f.write(f"#SBATCH --error={self.__std_err_path}.%j\n")
                     f.write(f"#SBATCH --output={self.__std_out_path}.%j\n")
@@ -440,7 +440,7 @@ class SlurmConfiguration:
 
         # sbatch it
         try:
-            res = subprocess.run(["sbatch", self.__slurm_script_file+".sh"], stdout=subprocess.PIPE, executable="/bin/bash")
+            res = subprocess.run(["sbatch", self.__slurm_script_file+".sh"], stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
             if res.returncode != 0:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
             res = res.stdout.decode("utf-8")

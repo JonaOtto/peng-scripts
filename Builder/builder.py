@@ -40,7 +40,7 @@ class BasicBuilder:
         old_dir = os.getcwd()
         os.chdir(self.home_dir+"/issm-build-scripts/install/")
         # Step 2: run "./issm-build.sh PATH_TO_SOURCE"
-        res = subprocess.run([f"./issm-build.sh {self.home_dir}/{self.source_path}"], shell=True, executable="/bin/bash")
+        res = subprocess.run([f"./issm-build.sh {self.home_dir}/{self.source_path}"], shell=True, executable="/bin/bash", env=os.environ.copy())
         if res.returncode != 0:
             raise CommandExecutionException(f"./issm-build.sh {self.home_dir}/{self.source_path}")
         # cd back to old dir
@@ -54,8 +54,12 @@ class BasicBuilder:
         # Step 2: source issm-load.sh
         # "source" is a bash build-in command, you need a bash shell to run it,
         # not just a subprocess. Therefore, shell=True and executable="/bin/bash"
-        res = subprocess.run(["source issm-load.sh"], shell=True, executable="/bin/bash")
+        res = subprocess.run(["source issm-load.sh"], shell=True, executable="/bin/bash", env=os.environ.copy())
         if res.returncode != 0:
             raise CommandExecutionException(f"source issm-load.sh")
+        try:
+            print("\n\n\n"+os.environ["ISSM_DIR"]+"\n\n\n")
+        except KeyError as e:
+            print("\n\n\n"+"ISSM_DIR not set."+"\n\n\n")
         # cd back to old dir
         os.chdir(old_dir)

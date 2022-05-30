@@ -48,14 +48,14 @@ class BaseRun:
         self.resolution = resolution
         self.compiler = compiler
         self.num_mpi_ranks = num_mpi_ranks
-        self.own_build = True
+        self.own_build = own_build
         self.runner = runner
         self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {run_command}"
         self.cleanup_build = cleanup_build
         self.jobfile = None
         self.home_dir = os.path.expanduser('~')
         self.builder = BasicBuilder(app, source_path[app])
-        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT/ERR/JOB]
+        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT_ID/ERR_ID/JOB]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.slurm_configuration = DefaultPEngSlurmConfig(
