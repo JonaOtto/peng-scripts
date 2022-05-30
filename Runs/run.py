@@ -64,7 +64,12 @@ class BaseRun:
         # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
-        self.slurm_configuration = None
+        # Slurm config
+        self.slurm_configuration = DefaultPEngSlurmConfig(
+            job_name=self.jobname_skeleton,
+            job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
+            num_mpi_ranks=self.num_mpi_ranks
+        )
 
     def add_tool(self, name: str):
         """
