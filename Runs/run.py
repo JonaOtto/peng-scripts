@@ -119,9 +119,9 @@ class BaseRun:
         Runs the summarized command, in ONE subprocess call.
         """
         res = subprocess.run(["bash", "-c", self.execution_command],
-                             executable="/bin/bash",
-                             shell=True,
-                             env=os.environ.copy(),
+                             #executable="/bin/bash",
+                             #shell=True,
+                             #env=os.environ.copy(),
                              stdout=subprocess.PIPE)
         if res.returncode != 0:
             raise CommandExecutionException(self.execution_command)
