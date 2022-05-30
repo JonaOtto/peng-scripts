@@ -116,7 +116,7 @@ class BaseRun:
             run_cmd.append(f"echo '####################### Step {n} #######################'")
             run_cmd.append(cmd)
             n = n + 1
-        self.execution_command = ";".join(run_cmd)[1:]
+        self.execution_command = ";".join(run_cmd)
         print(self.execution_command)
 
         res = subprocess.run(["bash", "-c", self.execution_command],
