@@ -376,8 +376,8 @@ class SlurmConfiguration:
                     f.write(f"#SBATCH --error={self.__std_err_path}_%A_%a.err\n")
                     f.write(f"#SBATCH --output={self.__std_out_path}_%A_%a.out\n")
                 else:
-                    f.write(f"#SBATCH --error={self.__std_err_path}.%j\n")
-                    f.write(f"#SBATCH --output={self.__std_out_path}.%j\n")
+                    f.write(f"#SBATCH --error={self.__std_err_path}_%j.err\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}_%j.out\n")
                 f.write(f"#SBATCH --time={self.__time_str}\n")
                 # TODO Add job array! If job-array is in place, name the out and err files with the id?
 
@@ -481,4 +481,4 @@ class SlurmConfiguration:
         """
         while not self.__check_squeue(job_id):
             time.sleep(60)
-        return self.__std_out_path, self.__std_err_path
+        return f"{self.__std_out_path}_{job_id}.out", f"{self.__std_err_path}_{job_id}.err"

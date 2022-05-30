@@ -25,7 +25,8 @@ model_setup_path = {
 }
 # mpirun -n 96 $ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER
 default_runner = "mpirun"
-default_run_command = "$ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER"
+default_executable = "$ISSM_DIR/bin/issm.exe"
+default_run_command = "TransientSolution $PWD PAtransient_std_$FOLDER"
 
 
 class BaseRun:
@@ -50,11 +51,11 @@ class BaseRun:
         self.num_mpi_ranks = num_mpi_ranks
         self.own_build = own_build
         self.runner = runner
-        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {run_command}"
+        self.home_dir = os.path.expanduser('~')
+        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {self.home_dir}/{executable_path[self.app]} {run_command}"
         self.cleanup_build = cleanup_build
         self.execution_command = []
         self.jobfile = None
-        self.home_dir = os.path.expanduser('~')
         self.builder = BasicBuilder(app, source_path[app])
         # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT_ID/ERR_ID/JOB]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
@@ -102,6 +103,7 @@ class BaseRun:
         #     raise RuntimeError(e)
         self.__add_execution_command(self.builder.load_modules())
         # generate job_script:
+        run_command = f"{self.runner} "
         self.slurm_configuration.add_command(self.run_command)
         self.slurm_configuration.write_slurm_script()
 
