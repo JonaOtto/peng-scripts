@@ -3,7 +3,7 @@
 import os
 import subprocess
 import time
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from SLURM.exceptions import ModuleDependencyConflict, ScriptNotFoundException, CommandExecutionException
 
@@ -422,7 +422,7 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self, return_command: bool = False) -> int | str:
+    def sbatch(self, return_command: bool = False) -> Union[int, str]:
         """
         Saves the SLURM script to the file and submits the job on the system via "sbatch"-command.
         Synchron version: It will just submit the job, you have to care about everything else.
