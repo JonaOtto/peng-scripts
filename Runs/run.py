@@ -122,7 +122,7 @@ class BaseRun:
             run_cmd.append(cmd)
             run_cmd.append(f"echo '';echo '';echo '';echo 'Step {n}!!!!';echo '';echo '';echo ''")
             n = n + 1
-        self.execution_command = ";".join(run_cmd)
+        self.execution_command = ";".join(run_cmd)[1:]
 
         self.__print_step(self.execution_command)
 
