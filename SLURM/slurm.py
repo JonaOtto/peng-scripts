@@ -375,11 +375,11 @@ class SlurmConfiguration:
                 f.write("### Job information:\n")
                 f.write(f"#SBATCH --job-name='{self.__job_name}'\n")
                 if self.__job_array:
-                    f.write(f"#SBATCH --error={self.__std_err_path}.%A_%a.err\n")
-                    f.write(f"#SBATCH --output={self.__std_out_path}.%A_%a.out\n")
+                    f.write(f"#SBATCH --error={self.__std_err_path}.%A_%a\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}.%A_%a\n")
                 else:
-                    f.write(f"#SBATCH --error={self.__std_err_path}.%j.err\n")
-                    f.write(f"#SBATCH --output={self.__std_out_path}.%j.out\n")
+                    f.write(f"#SBATCH --error={self.__std_err_path}.%j\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}.%j\n")
                 f.write(f"#SBATCH --time={self.__time_str}\n")
                 # TODO Add job array! If job-array is in place, name the out and err files with the id?
 
@@ -424,11 +424,11 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self, return_command: bool = False) -> Union[int, str]:
+    def sbatch(self, active: bool = False) -> Union[int, str]:
         """
         Saves the SLURM script to the file and submits the job on the system via "sbatch"-commands.
         Synchron version: It will just submit the job, you have to care about everything else.
-        :param return_command: Do not run the commands, just return it.
+        :param active: Do not run the commands, just return it.
         :return: The job id. Or if return_command set: The sbatch commands.
         """
         # check dirs: Just check for dirs, file may not be there, but slurm will create it
@@ -446,7 +446,7 @@ class SlurmConfiguration:
 
         # sbatch it
         sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]
-        if return_command:
+        if not active:
             return " ".join(sbatch_command)
         try:
             res = subprocess.run(sbatch_command, stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())

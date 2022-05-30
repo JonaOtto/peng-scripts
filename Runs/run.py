@@ -21,8 +21,12 @@ model_setup_path = {
     Resolution.G4000: "greenland-setup/G4000",
     Resolution.G16000: "greenland-setup/G16000",
     Resolution.G64000: "greenland-setup/G64000"
-
 }
+is_active = {
+    "build": True,
+    "load_modules": False,
+    "run": False,
+}  # analyze and cleanup are after this: there are "active" bey default.
 # mpirun -n 96 $ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER
 default_runner = "mpirun"
 default_executable = "$ISSM_DIR/bin/issm.exe"
@@ -57,7 +61,7 @@ class BaseRun:
         self.execution_command = []
         self.jobfile = None
         self.builder = BasicBuilder(app, source_path[app])
-        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB]
+        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.slurm_configuration = DefaultPEngSlurmConfig(
@@ -90,28 +94,30 @@ class BaseRun:
         Builds the ISSM build.
         """
         if self.own_build:
-            # TODO maybe do additional ENV loading here
-            # try:
-            #     self.builder.build()
-            # except CommandExecutionException as e:
-            #     raise RuntimeError(e)
-            self.__add_execution_command(self.builder.build())
-        # TODO maybe do additional Module loading here
-        # try:
-        #     self.builder.load_modules()
-        # except CommandExecutionException as e:
-        #     raise RuntimeError(e)
-        self.__add_execution_command(self.builder.load_modules())
+            if is_active["build"]:
+                # TODO maybe do additional ENV loading here
+                try:
+                    self.builder.build(active=True)
+                except CommandExecutionException as e:
+                    raise RuntimeError(e)
+            else:
+                self.__add_execution_command(self.builder.build(active=False))
+        if is_active["load_modules"]:
+            # TODO maybe do additional Module loading here
+            try:
+                self.builder.load_modules(active=True)
+            except CommandExecutionException as e:
+                raise RuntimeError(e)
+        else:
+            self.__add_execution_command(self.builder.load_modules(active=False))
         # generate job_script:
-        run_command = f"{self.runner} "
         self.slurm_configuration.add_command(self.run_command)
         self.slurm_configuration.write_slurm_script()
 
-    def __run_execution_command(self):
+    def __run_passive_commands(self):
         """
         Runs the summarized commands, in ONE subprocess call.
         """
-        print(self.execution_command)
         # put step numbers in output:
         run_cmd = []
         n = 1
@@ -120,7 +126,6 @@ class BaseRun:
             run_cmd.append(cmd)
             n = n + 1
         self.execution_command = ";".join(run_cmd)
-        print(self.execution_command)
 
         res = subprocess.run(["bash", "-c", self.execution_command],
                              executable="/bin/bash",
@@ -135,16 +140,19 @@ class BaseRun:
         """
         Runs the build.
         """
-        sbatch_command = self.slurm_configuration.sbatch(return_command=True)
-        print("Sbatch command: ", sbatch_command)
-        self.__add_execution_command([f"cd {self.home_dir}/{model_setup_path[self.resolution]}", sbatch_command])
-        # execute the whole thing:
-        res = self.__run_execution_command()
-        # get job id from res:
-        res = res.stdout.decode("utf-8")
-        print("Result: ", res)
-        res = res.split("Submitted batch job")[1]
-        job_id = int(res.split(" ")[1].split("\n")[0])
+        if is_active["run"]:
+            job_id = self.slurm_configuration.sbatch(active=True)
+        else:
+            sbatch_command = self.slurm_configuration.sbatch(active=False)
+            print("Sbatch command: ", sbatch_command)
+            self.__add_execution_command([f"cd {self.home_dir}/{model_setup_path[self.resolution]}", sbatch_command])
+            # execute the whole thing:
+            res = self.__run_passive_commands()
+            # get job id from res:
+            res = res.stdout.decode("utf-8")
+            print("Result: ", res)
+            res = res.split("Submitted batch job")[1]
+            job_id = int(res.split(" ")[1].split("\n")[0])
         return self.slurm_configuration.wait(job_id)
 
     def cleanup(self, remove_build: bool = False):
@@ -158,11 +166,11 @@ class BaseRun:
             os.remove(f"{self.home_dir}/{folder}/issm-load.sh")  # issm-load.sh
             os.remove(f"{self.home_dir}/{folder}/issmModule.lua")  # issmMoudle.lua
 
-    def analyse(self):
+    def analyze(self):
         """
-        Analyse the output.
+        Analyze the output.
         """
-        print("Analysing...")
+        print("Analyzing...")
 
     def do_run(self):
         """
@@ -173,7 +181,7 @@ class BaseRun:
         self.cleanup(remove_build=self.cleanup_build)
         print(out_path)
         print(error_path)
-        self.analyse()
+        self.analyze()
         return
 
 
