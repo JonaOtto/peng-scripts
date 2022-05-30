@@ -82,32 +82,32 @@ class BaseBuilder:
                 arg = "llvm"
             else:
                 arg = build_defaults["compiler"]
-            lines[12] = "=".join([cmd, arg])
+            lines[12] = "=".join([cmd, arg])+"\n"
         if self.gcc_version != build_defaults["gcc_version"]:
             cmd, arg = lines[13].split("=")
-            lines[13] = "=".join([cmd, self.gcc_version])
+            lines[13] = "=".join([cmd, self.gcc_version])+"\n"
         if self.llvm_version != build_defaults["llvm_version"]:
             cmd, arg = lines[14].split("=")
-            lines[14] = "=".join([cmd, self.llvm_version])
+            lines[14] = "=".join([cmd, self.llvm_version])+"\n"
         if self.c_compiler_flags != build_defaults["c_compiler_flags"]:
             cmd, arg = lines[16].split("=")
-            lines[16] = "=".join([cmd, self.c_compiler_flags])
+            lines[16] = "=".join([cmd, self.c_compiler_flags])+"\n"
         if self.cxx_compiler_flags != build_defaults["cxx_compiler_flags"]:
             cmd, arg = lines[20].split("=")
-            lines[20] = "=".join([cmd, self.cxx_compiler_flags])
+            lines[20] = "=".join([cmd, self.cxx_compiler_flags])+"\n"
         if self.fortran_compiler_flags != build_defaults["fortran_compiler_flags"]:
             cmd, arg = lines[21].split("=")
-            lines[21] = "=".join([cmd, self.fortran_compiler_flags])
+            lines[21] = "=".join([cmd, self.fortran_compiler_flags])+"\n"
         if self.petsc_version != build_defaults["petsc_version"]:
             cmd, arg = lines[31].split("=")
-            lines[31] = "=".join([cmd, self.petsc_version])
+            lines[31] = "=".join([cmd, self.petsc_version])+"\n"
         if self.scorep_instrumentation != build_defaults["scorep_instrumentation"]:
             cmd, arg = lines[34].split("=")
             arg = "1" if self.scorep_instrumentation else "0"
-            lines[34] = "=".join([cmd, arg])
+            lines[34] = "=".join([cmd, arg])+"\n"
         if self.scorep_flags != build_defaults["scorep_flags"]:
             cmd, arg = lines[35].split("=")
-            lines[35] = "=".join([cmd, self.scorep_flags])
+            lines[35] = "=".join([cmd, self.scorep_flags])+"\n"
         with open("env-build.sh", "w") as envbuildsh:
             for line in lines:
                 envbuildsh.write(line)
