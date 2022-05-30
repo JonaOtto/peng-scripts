@@ -37,7 +37,7 @@ Usage: Use the gui to start your application. See results right there.
 
 ### Score-P ###
 
-Usage: Put "scorep" in front of your compile command. This generates a "profile",
+Usage: Put "scorep" in front of your compile commands. This generates a "profile",
 or a "trace-set" if you enable SCOREP_ENABLE_TRACING.
 You can view traces (otf2) with vampir or scalasca, and profiles (cube) with CUBE. 
 Caution: Traces are getting VERY LARGE very fast! (SCRATCH!)

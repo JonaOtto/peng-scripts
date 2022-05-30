@@ -52,7 +52,7 @@ class BaseRun:
         self.runner = runner
         self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {run_command}"
         self.cleanup_build = cleanup_build
-        self.execution_command = ""
+        self.execution_command = []
         self.jobfile = None
         self.home_dir = os.path.expanduser('~')
         self.builder = BasicBuilder(app, source_path[app])
@@ -67,7 +67,7 @@ class BaseRun:
 
     def prepend_run_command(self, prefix: str):
         """
-        Puts something in front of the run command.
+        Puts something in front of the run commands.
         """
         self.run_command = f"{prefix} {self.run_command}"
 
@@ -78,14 +78,11 @@ class BaseRun:
         pipe_sign = ">" if triangle_pipe else "|"
         self.run_command = f"{self.run_command} {pipe_sign} {to_file_path}"
 
-    def __add_execution_command(self, command):
+    def __add_execution_command(self, commands):
         """
-        Adds a command to add to execution. Helper: Everything must be in ONE subprocess call, otherwise it messes up env vars.
+        Adds a commands to add to execution. Helper: Everything must be in ONE subprocess call, otherwise it messes up env vars.
         """
-        if self.execution_command == "":
-            self.execution_command = command
-        else:
-            self.execution_command = self.execution_command + "; " + command
+        self.execution_command.extend(commands)
 
     def __print_step(self, s):
         """
@@ -116,12 +113,23 @@ class BaseRun:
 
     def __run_execution_command(self):
         """
-        Runs the summarized command, in ONE subprocess call.
+        Runs the summarized commands, in ONE subprocess call.
         """
+        # put step numbers in output:
+        run_cmd = []
+        n = 0
+        for cmd in self.execution_command:
+            run_cmd.append(cmd)
+            run_cmd.append(f"echo '';echo '';echo '';echo 'Step {n}!!!!';echo '';echo '';echo ''")
+            n = n + 1
+        self.execution_command = ";".join(run_cmd)
+
+        self.__print_step(self.execution_command)
+
         res = subprocess.run(["bash", "-c", self.execution_command],
                              #executable="/bin/bash",
                              #shell=True,
-                             #env=os.environ.copy(),
+                             env=os.environ.copy(),
                              stdout=subprocess.PIPE)
         if res.returncode != 0:
             raise CommandExecutionException(self.execution_command)
@@ -139,7 +147,7 @@ class BaseRun:
         # get job id from res:
         res = res.stdout.decode("utf-8")
         res = res.split("Submitted batch job")[1]
-        job_id = int(res.split(" ")[1])
+        job_id = int(res.split(" ")[1].split("\n")[0])
         self.__print_step(f"Job ID: {job_id}")
         return self.slurm_configuration.wait(job_id)
 

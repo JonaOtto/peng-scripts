@@ -45,7 +45,7 @@ class BasicBuilder:
         #     raise CommandExecutionException(f"./issm-build.sh {self.home_dir}/{self.source_path}")
         # # cd back to old dir
         # os.chdir(old_dir)
-        return f"cd {self.home_dir}/issm-build-scripts/install/; ./issm-build.sh {self.home_dir}/{self.source_path}"
+        return [f"cd {self.home_dir}/issm-build-scripts/install/", f"./issm-build.sh {self.home_dir}/{self.source_path}"]
 
     def load_modules(self):
         # # Step 1: cd into the source_dir, there will now be a "issm-load.sh"
@@ -53,11 +53,11 @@ class BasicBuilder:
         # os.chdir(self.home_dir+"/"+self.source_path)
         # print(os.getcwd())
         # # Step 2: source issm-load.sh
-        # # "source" is a bash build-in command, you need a bash shell to run it,
+        # # "source" is a bash build-in commands, you need a bash shell to run it,
         # # not just a subprocess. Therefore, shell=True and executable="/bin/bash"
         # res = subprocess.run(["source issm-load.sh"], shell=True, executable="/bin/bash", env=os.environ.copy())
         # if res.returncode != 0:
         #     raise CommandExecutionException(f"source issm-load.sh")
         # # cd back to old dir
         # os.chdir(old_dir)
-        return f"cd {self.home_dir}/{self.source_path}; source issm-load.sh"
+        return [f"cd {self.home_dir}/{self.source_path}", "source issm-load.sh"]

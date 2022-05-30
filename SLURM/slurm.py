@@ -119,7 +119,7 @@ class SlurmConfiguration:
         Has no effect if "uses_module_system" is not True. Default: True.
         :param check_dirs_to_out: Check the path to stdout and stderr files for non-existing directories,
         and add them if some are missing. Default: True.
-        :param use_set_u: If the command "set -u" should be added to your SLURM job file. Default: False.
+        :param use_set_u: If the commands "set -u" should be added to your SLURM job file. Default: False.
         """
         self.__slurm_script_file = slurm_script_file
         self.__job_name = job_name
@@ -185,7 +185,7 @@ class SlurmConfiguration:
         and task id prints should be added to the SLURM script automatically. Default: True.
         :param check_dirs_to_out: Check the path to stdout and stderr files for non-existing directories,
         and add them if some are missing. Default: True.
-        :param use_set_u: If the command "set -u" should be added to your SLURM job file. Default: False.
+        :param use_set_u: If the commands "set -u" should be added to your SLURM job file. Default: False.
         :return: void.
         """
         self.__echo_job_task_info = echo_job_task_info
@@ -224,7 +224,7 @@ class SlurmConfiguration:
         """
         Adds a module to be load from the module system. If this module (same name) was already added, this will
         only override the version, or do nothing.
-        This is just like adding a command "module load <name>",
+        This is just like adding a commands "module load <name>",
         just for more convince on systems with a module system in place.
         :param name: The name of the module to load.
         :param version: The version of the module. If not give it will be loaded without a specific version,
@@ -242,9 +242,9 @@ class SlurmConfiguration:
 
     def add_command(self, command: str) -> None:
         """
-        Adds a command to run from inside the sbatch job. These are the actual working commands,
+        Adds a commands to run from inside the sbatch job. These are the actual working commands,
         not the SLURM config comments.
-        :param command: The command to add.
+        :param command: The commands to add.
         :return: void.
         """
         self.__commands.append(command)
@@ -422,12 +422,12 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self, return_command: bool = False) -> Union[int, str]:
+    def sbatch(self, return_command: bool = False) -> Union[int,list[str]]:
         """
-        Saves the SLURM script to the file and submits the job on the system via "sbatch"-command.
+        Saves the SLURM script to the file and submits the job on the system via "sbatch"-commands.
         Synchron version: It will just submit the job, you have to care about everything else.
-        :param return_command: Do not run the command, just return it.
-        :return: The job id. Or if return_command set: The sbatch command.
+        :param return_command: Do not run the commands, just return it.
+        :return: The job id. Or if return_command set: The sbatch commands.
         """
         # check dirs: Just check for dirs, file may not be there, but slurm will create it
         # as long as the directory is in place
@@ -445,7 +445,7 @@ class SlurmConfiguration:
         # sbatch it
         sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]
         if return_command:
-            return " ".join(sbatch_command)
+            return [" ".join(sbatch_command)]
         try:
             res = subprocess.run(sbatch_command, stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
             if res.returncode != 0:
@@ -459,7 +459,7 @@ class SlurmConfiguration:
 
     def __check_squeue(self, job_id: int) -> bool:
         """
-        Checks the output of the "squeue" command and returns whether job with that id is completed or not.
+        Checks the output of the "squeue" commands and returns whether job with that id is completed or not.
         :param job_id: The job id to find status for.
         :return: True if job is completed, false otherwise.
         """
