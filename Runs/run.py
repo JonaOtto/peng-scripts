@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from Builder.builder import BasicBuilder, App, Resolution, Compiler
+from Builder.builder import BaseBuilder, App, Resolution, Compiler
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
 # source and executable paths by app:
@@ -60,7 +60,7 @@ class BaseRun:
         self.cleanup_build = cleanup_build
         self.execution_command = []
         self.jobfile = None
-        self.builder = BasicBuilder(app, source_path[app])
+        self.builder = BaseBuilder(app, source_path[app])
         # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
@@ -220,7 +220,7 @@ class GProfRun(BaseRun):
         self.add_tool("GPROF")
         # add gprof
         # super().prepend_run_command(prefix="gprof")
-        file_name = f"{self.jobname_skeleton}_GPROF.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
+        file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = self.slurm_configuration.get_out_dir()+file_name
         self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")
         #super().pipe_run_command(to_file_path=self.slurm_configuration.get_out_dir()+file_name)
