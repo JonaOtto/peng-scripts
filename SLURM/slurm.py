@@ -467,6 +467,8 @@ class SlurmConfiguration:
         #      JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMIT PRIORITY    NODES NODELIST(REASON)
         #   28712165 kurs00054 JOB_ISSM jo83xafu  RUNNING       0:24      15:00 13054           1 mpsc0154
         sq = subprocess.Popen(["squeue"], stdout=subprocess.PIPE)
+        print(sq.stdout)
+        print(job_id)
         if str(job_id) not in sq.stdout:
             return True
         else:
