@@ -119,9 +119,6 @@ class BaseRun:
         self.execution_command = ";".join(run_cmd)
         print(self.execution_command)
 
-        # bevor executing: must be in the greenland-model dir:
-        os.chdir(f"{self.home_dir}/{model_setup_path[self.resolution]}/")
-
         res = subprocess.run(["bash", "-c", self.execution_command],
                              executable="/bin/bash",
                              #shell=True,
@@ -137,7 +134,7 @@ class BaseRun:
         """
         sbatch_command = self.slurm_configuration.sbatch(return_command=True)
         print("Sbatch command: ", sbatch_command)
-        self.__add_execution_command(sbatch_command)
+        self.__add_execution_command([f"cd {self.home_dir}/{model_setup_path[self.resolution]}", sbatch_command])
         # execute the whole thing:
         res = self.__run_execution_command()
         # get job id from res:
