@@ -95,12 +95,12 @@ class BaseRun:
             # except CommandExecutionException as e:
             #     raise RuntimeError(e)
             self.__add_execution_command(self.builder.build())
-            # TODO maybe do additional Module loading here
-            # try:
-            #     self.builder.load_modules()
-            # except CommandExecutionException as e:
-            #     raise RuntimeError(e)
-            self.__add_execution_command(self.builder.load_modules())
+        # TODO maybe do additional Module loading here
+        # try:
+        #     self.builder.load_modules()
+        # except CommandExecutionException as e:
+        #     raise RuntimeError(e)
+        self.__add_execution_command(self.builder.load_modules())
         # generate job_script:
         self.slurm_configuration.add_command(self.run_command)
         self.slurm_configuration.write_slurm_script()
@@ -162,6 +162,7 @@ class BaseRun:
         self.prepare()
         out_path, error_path = self.run()
         self.cleanup(remove_build=self.cleanup_build)
+        print(out_path, error_path)
         return out_path, error_path
 
 
