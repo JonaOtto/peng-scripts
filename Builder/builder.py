@@ -108,9 +108,9 @@ class BaseBuilder:
         if self.scorep_flags != build_defaults["scorep_flags"]:
             cmd, arg = lines[35].split("=")
             lines[35] = "=".join([cmd, self.scorep_flags])+"\n"
-        with open("env-build.sh", "w") as envbuildsh:
+        with open("env-build.sh", "w") as env_build_sh:
             for line in lines:
-                envbuildsh.write(line)
+                env_build_sh.write(line)
         os.chdir(old_dir)
 
     def build(self, active: bool = True):
