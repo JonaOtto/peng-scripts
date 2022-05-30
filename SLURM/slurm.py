@@ -7,6 +7,8 @@ from typing import Optional, List, Union
 
 from SLURM.exceptions import ModuleDependencyConflict, ScriptNotFoundException, CommandExecutionException
 
+SQUEUE_CHECK_INTERVAL = 20
+
 
 class MailType:
     """
@@ -373,11 +375,11 @@ class SlurmConfiguration:
                 f.write("### Job information:\n")
                 f.write(f"#SBATCH --job-name='{self.__job_name}'\n")
                 if self.__job_array:
-                    f.write(f"#SBATCH --error={self.__std_err_path}_%A_%a.err\n")
-                    f.write(f"#SBATCH --output={self.__std_out_path}_%A_%a.out\n")
+                    f.write(f"#SBATCH --error={self.__std_err_path}.%A_%a.err\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}.%A_%a.out\n")
                 else:
-                    f.write(f"#SBATCH --error={self.__std_err_path}_%j.err\n")
-                    f.write(f"#SBATCH --output={self.__std_out_path}_%j.out\n")
+                    f.write(f"#SBATCH --error={self.__std_err_path}.%j.err\n")
+                    f.write(f"#SBATCH --output={self.__std_out_path}.%j.out\n")
                 f.write(f"#SBATCH --time={self.__time_str}\n")
                 # TODO Add job array! If job-array is in place, name the out and err files with the id?
 
@@ -480,5 +482,6 @@ class SlurmConfiguration:
         :return: It will return the paths to the result files of the job.
         """
         while not self.__check_squeue(job_id):
-            time.sleep(60)
+
+            time.sleep(SQUEUE_CHECK_INTERVAL)
         return f"{self.__std_out_path}_{job_id}.out", f"{self.__std_err_path}_{job_id}.err"

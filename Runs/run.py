@@ -13,8 +13,8 @@ source_path = {
     App.ISSM_4_18: "issm-4.18/"
 }
 executable_path = {
-    App.ISSM_MINIAPP_THERMAL: "issm-miniapps/bin/miniappthermal.exe",
-    App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapps/bin/miniappstressbalance.exe",
+    App.ISSM_MINIAPP_THERMAL: "issm-miniapp/bin/miniappthermal.exe",
+    App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp/bin/miniappstressbalance.exe",
     App.ISSM_4_18: "issm-4.18/bin/issm.exe"
 }
 model_setup_path = {
@@ -57,7 +57,7 @@ class BaseRun:
         self.execution_command = []
         self.jobfile = None
         self.builder = BasicBuilder(app, source_path[app])
-        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT_ID/ERR_ID/JOB]
+        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.slurm_configuration = DefaultPEngSlurmConfig(
