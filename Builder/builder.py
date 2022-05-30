@@ -74,7 +74,15 @@ class BaseBuilder:
         # make a copy to edit
         subprocess.run(["cp", "env-build-BACKUP.sh", "env-build.sh"])
         lines = open("env-build.sh", "r").readlines()
-        print(lines[12])
+        print("Compiler: ", lines[12])
+        print("GCC Version: ", lines[13])
+        print("LLVM Version: ", lines[14])
+        print("C Flags: ", lines[16])
+        print("C++ Flags: ", lines[20])
+        print("F Flags: ", lines[21])
+        print("PETSc version: ", lines[31])
+        print("ScoreP Instrumentation: ", lines[34])
+        print("ScoreP Flags: ", lines[35])
         raise RuntimeError()
 
     def build(self, active: bool = True):
