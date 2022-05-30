@@ -469,7 +469,7 @@ class SlurmConfiguration:
         sq = subprocess.run(["squeue"], stdout=subprocess.PIPE)
         print(sq.stdout.decode("utf-8"))
         print(job_id)
-        if str(job_id) not in sq.stdout:
+        if str(job_id) not in sq.stdout.decode("utf-8"):
             return True
         else:
             return False
