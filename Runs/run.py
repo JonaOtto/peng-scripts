@@ -209,7 +209,7 @@ class GProfRun(BaseRun):
         This file can be read, or viewed with the gprof GUI (https://www.ulfdittmer.com/profileviewer/).
         """
         # update the job name
-        super().jobname_skeleton = f"{super().jobname_skeleton}_GPROF"
+        self.jobname_skeleton = f"{self.jobname_skeleton}_GPROF"
         # add gprof
         # super().prepend_run_command(prefix="gprof")
         file_name = f"{self.jobname_skeleton}_GPROF.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
