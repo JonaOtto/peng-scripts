@@ -5,6 +5,8 @@ from Builder.builder import BasicBuilder, App, Resolution, Compiler
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
 # source and executable paths by app:
+from SLURM.exceptions import CommandExecutionException
+
 source_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp/",
     App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp/",
@@ -81,9 +83,15 @@ class BaseRun:
         """
         if self.own_build:
             # TODO maybe do additional ENV loading here
-            self.builder.build()
+            try:
+                self.builder.build()
+            except CommandExecutionException as e:
+                raise RuntimeError(e)
             # TODO maybe do additional Module loading here
-            self.builder.load_modules()
+            try:
+                self.builder.load_modules()
+            except CommandExecutionException as e:
+                raise RuntimeError(e)
         # generate job_script:
         self.slurm_configuration.add_command(self.run_command)
         self.slurm_configuration.write_slurm_script()
