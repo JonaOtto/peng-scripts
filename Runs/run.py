@@ -84,12 +84,6 @@ class BaseRun:
         """
         self.execution_command.extend(commands)
 
-    def __print_step(self, s):
-        """
-        Prints s.
-        """
-        print(f"\n\n\n{s}\n\n\n")
-
     def prepare(self):
         """
         Builds the ISSM build.
@@ -117,14 +111,12 @@ class BaseRun:
         """
         # put step numbers in output:
         run_cmd = []
-        n = 0
+        n = 1
         for cmd in self.execution_command:
             run_cmd.append(cmd)
-            run_cmd.append(f"echo '';echo '';echo '';echo 'Step {n}!!!!';echo '';echo '';echo ''")
+            run_cmd.append(f"echo '####################### Step {n} #######################'")
             n = n + 1
         self.execution_command = ";".join(run_cmd)[1:]
-
-        self.__print_step(self.execution_command)
 
         res = subprocess.run(["bash", "-c", self.execution_command],
                              #executable="/bin/bash",
@@ -143,12 +135,10 @@ class BaseRun:
         self.__add_execution_command(sbatch_command)
         # execute the whole thing:
         res = self.__run_execution_command()
-        self.__print_step(self.execution_command)
         # get job id from res:
         res = res.stdout.decode("utf-8")
         res = res.split("Submitted batch job")[1]
         job_id = int(res.split(" ")[1].split("\n")[0])
-        self.__print_step(f"Job ID: {job_id}")
         return self.slurm_configuration.wait(job_id)
 
     def cleanup(self, remove_build: bool = False):
@@ -166,11 +156,8 @@ class BaseRun:
         """
         Runs the whole run.
         """
-        self.__print_step("STARTING PREPARATION")
         self.prepare()
-        self.__print_step("STARTING RUN")
         out_path, error_path = self.run()
-        self.__print_step("STARTING CLEANUP")
         self.cleanup(remove_build=self.cleanup_build)
         return out_path, error_path
 
