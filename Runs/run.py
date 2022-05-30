@@ -137,6 +137,7 @@ class BaseRun:
         res = self.__run_execution_command()
         # get job id from res:
         res = res.stdout.decode("utf-8")
+        print(res)
         res = res.split("Submitted batch job")[1]
         job_id = int(res.split(" ")[1].split("\n")[0])
         return self.slurm_configuration.wait(job_id)
