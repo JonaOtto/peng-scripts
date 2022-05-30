@@ -108,11 +108,13 @@ class BaseRun:
         )
         if self.own_build:
             if is_active["build"]:
+                self.builder.prepare_build()
                 # TODO maybe do additional ENV loading here
                 try:
                     self.builder.build(active=True)
                 except CommandExecutionException as e:
                     raise RuntimeError(e)
+                self.builder.cleanup_build()
             else:
                 self.__add_execution_command(self.builder.build(active=False))
         if is_active["load_modules"]:
