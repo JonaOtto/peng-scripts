@@ -208,6 +208,11 @@ class GProfRun(BaseRun):
         Usage: gprof BIN_NAME > gprof.profile, will pipe a GProf profile into specified file. 
         This file can be read, or viewed with the gprof GUI (https://www.ulfdittmer.com/profileviewer/).
         """
-        super().prepend_run_command(prefix="gprof")
+        # update the job name
+        super().jobname_skeleton = f"{super().jobname_skeleton}_GPROF"
+        # add gprof
+        # super().prepend_run_command(prefix="gprof")
         file_name = f"{self.jobname_skeleton}_GPROF.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
-        super().pipe_run_command(to_file_path=self.slurm_configuration.get_out_dir()+file_name)
+        gprof_file = self.slurm_configuration.get_out_dir()+file_name
+        self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")
+        #super().pipe_run_command(to_file_path=self.slurm_configuration.get_out_dir()+file_name)
