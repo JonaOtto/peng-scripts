@@ -132,6 +132,9 @@ class BaseRun:
             job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
             num_mpi_ranks=self.num_mpi_ranks
         )
+        # make out dir, just in case something else puts stuff there
+        self.slurm_configuration.make_dirs()
+
         if self.own_build:
             if is_active["build"]:
                 self.builder.prepare_build()
@@ -323,5 +326,4 @@ class CompilerVectorizationReportRun(BaseRun):
                                                          path_all=f"{path}/{file_name_all}"
                                                          )
         self.builder = builder
-        self.slurm_configuration.make_dirs()
 

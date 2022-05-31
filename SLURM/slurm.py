@@ -434,7 +434,8 @@ class SlurmConfiguration:
         :param active: Do not run the commands, just return it.
         :return: The job id. Or if return_command set: The sbatch commands.
         """
-        self.make_dirs()
+        # happend earlier - comment in with other usages of this slurm module.
+        #self.make_dirs()
 
         # sbatch it
         sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]
