@@ -323,4 +323,5 @@ class CompilerVectorizationReportRun(BaseRun):
                                                          path_all=f"{path}/{file_name_all}"
                                                          )
         self.builder = builder
+        self.slurm_configuration.make_dirs()
 

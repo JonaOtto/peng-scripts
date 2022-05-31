@@ -413,13 +413,7 @@ class SlurmConfiguration:
             print(e)
             raise RuntimeError(f"Slurm script file cannot be found or created: {e}.")
 
-    def sbatch(self, active: bool = False) -> Union[int, str]:
-        """
-        Saves the SLURM script to the file and submits the job on the system via "sbatch"-commands.
-        Synchron version: It will just submit the job, you have to care about everything else.
-        :param active: Do not run the commands, just return it.
-        :return: The job id. Or if return_command set: The sbatch commands.
-        """
+    def make_dirs(self):
         # check dirs: Just check for dirs, file may not be there, but slurm will create it
         # as long as the directory is in place
         err_dir = "/".join(self.__std_err_path.split("/")[:-1])
@@ -432,6 +426,15 @@ class SlurmConfiguration:
             res = subprocess.run(["mkdir", "-p", out_dir])
             if not res.returncode == 0:
                 raise CommandExecutionException(f"mkdir -p {out_dir}")
+
+    def sbatch(self, active: bool = False) -> Union[int, str]:
+        """
+        Saves the SLURM script to the file and submits the job on the system via "sbatch"-commands.
+        Synchron version: It will just submit the job, you have to care about everything else.
+        :param active: Do not run the commands, just return it.
+        :return: The job id. Or if return_command set: The sbatch commands.
+        """
+        self.make_dirs()
 
         # sbatch it
         sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]

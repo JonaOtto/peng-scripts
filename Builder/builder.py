@@ -172,14 +172,26 @@ class CompilerVectorizationReportBuilder(BaseBuilder):
     Builder for Runs with Compiler Vectorization Report enabled.
     """
     def __init__(self, app: App, source_path: str, path_successful: str, path_unsuccessful: str, path_all: str = None, do_not_export_single_files: bool = False):
+        self.path_successful = path_successful
+        self.path_unsuccessful = path_unsuccessful
+        self.path_all = path_all
+        self.do_not_export_single_files = do_not_export_single_files
         # enable vectorization
         additional_compiler_flags = "-ftree-vectorize "
         # add out file paths
-        if not do_not_export_single_files:
-            additional_compiler_flags += f"-fopt-info-vec-optimized={path_successful} -fopt-info-vec-missed={path_unsuccessful}"
-        if path_all:
-            additional_compiler_flags += f"-fopt-info-vec-all={path_all}"
+        if not self.do_not_export_single_files:
+            additional_compiler_flags += f"-fopt-info-vec-optimized={self.path_successful} -fopt-info-vec-missed={self.path_unsuccessful}"
+        if self.path_all:
+            additional_compiler_flags += f"-fopt-info-vec-all={self.path_all}"
         super().__init__(app, source_path,
                          c_compiler_flags=f"'{build_defaults['c_compiler_flags']} {additional_compiler_flags}'",
                          cxx_compiler_flags=f"'{build_defaults['cxx_compiler_flags']} {additional_compiler_flags}'",
                          )
+
+    def prepare_build(self):
+        super().prepare_build()
+        # touch out files, otherwise gcc cannot dump content in it
+        #if not self.do_not_export_single_files:
+        #    if self.path_all:
+        #        subprocess.run(["bash", "-c", f"touch {}"])
+
