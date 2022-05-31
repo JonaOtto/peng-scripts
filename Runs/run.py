@@ -214,7 +214,6 @@ class BaseRun:
         Runs the whole run.
         """
         self.prepare()
-        raise RuntimeError()
         out_path, error_path = self.run()
         self.cleanup(remove_build=self.cleanup_build)
         print(f"\nOut file: {out_path}")
