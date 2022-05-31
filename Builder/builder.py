@@ -165,3 +165,21 @@ class GProfBuilder(BaseBuilder):
                          c_compiler_flags=f"'{build_defaults['c_compiler_flags']} -pg'",
                          cxx_compiler_flags=f"'{build_defaults['cxx_compiler_flags']} -pg'",
                          )
+
+
+class CompilerVectorizationReportBuilder(BaseBuilder):
+    """
+    Builder for Runs with Compiler Vectorization Report enabled.
+    """
+    def __init__(self, app: App, source_path: str, path_successful: str, path_unsuccessful: str, path_all: str = None, do_not_export_single_files: bool = False):
+        # enable vectorization
+        additional_compiler_flags = "-ftree-vectorize"
+        # add out file paths
+        if not do_not_export_single_files:
+            additional_compiler_flags += f"-fopt-info-vec-optimized={path_successful} -fopt-info-vec-missed={path_unsuccessful}"
+        if path_all:
+            additional_compiler_flags += f"-fopt-info-vec-all={path_all}"
+        super().__init__(app, source_path,
+                         c_compiler_flags=f"'{build_defaults['c_compiler_flags']} {additional_compiler_flags}'",
+                         cxx_compiler_flags=f"'{build_defaults['cxx_compiler_flags']} {additional_compiler_flags}'",
+                         )

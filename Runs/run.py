@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder
+from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder, CompilerVectorizationReportBuilder
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
 # source and executable paths by app:
@@ -238,3 +238,41 @@ class GProfRun(BaseRun):
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = self.slurm_configuration.get_out_dir()+file_name
         self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")
+
+
+class CompilerVectorizationReportRun(BaseRun):
+    """
+    Run class for the Compiler Vectorization Report tool.
+    """
+
+    def __init__(self, app: App, resolution: Resolution, vec_out_dir: str = None, *args, **kwargs):
+        """
+        Constructor.
+        :param app: The app to run.
+        :param resolution: The resolution of the model to run.
+        :param vec_out_dir: Alternative dir for the out files. Otherwise, it will be constructed off the job name,
+        to adhere to the standard naming scheme. Give with trailing slash!
+        """
+        tool = "COMPILER_VEC_REPORT"
+        # we have to add the tool here bevor, because we can add it to the runner only if the super call took place,
+        # for this we need the builder first
+        file_name_opt = f"{self.jobname_skeleton}_{tool}.opt"
+        file_name_miss = f"{self.jobname_skeleton}_{tool}.miss"
+        file_name_all = None
+        if vec_out_dir:
+            file_name_all = f"{self.jobname_skeleton}_{tool}.all"
+        path = self.slurm_configuration.get_out_dir() if not vec_out_dir else vec_out_dir
+        if not vec_out_dir:
+            builder = CompilerVectorizationReportBuilder(app, source_path[app],
+                                                         path_successful=f"{path}{file_name_opt}",
+                                                         path_unsuccessful=f"{path}{file_name_miss}"
+                                                         )
+        else:
+            builder = CompilerVectorizationReportBuilder(app, source_path[app],
+                                                         path_successful=f"{path}{file_name_opt}",
+                                                         path_unsuccessful=f"{path}{file_name_miss}",
+                                                         path_all=f"{path}{file_name_all}"
+                                                         )
+        super().__init__(app, resolution, builder=builder, *args, **kwargs)
+        # update the job name
+        self.add_tool(tool)

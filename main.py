@@ -1,4 +1,4 @@
-from Runs.run import App, Resolution, GProfRun
+from Runs.run import App, Resolution, GProfRun, CompilerVectorizationReportRun
 
 if __name__ == '__main__':
     run = GProfRun(
