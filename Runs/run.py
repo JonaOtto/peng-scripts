@@ -8,9 +8,9 @@ from SLURM.default_slurm import DefaultPEngSlurmConfig
 from SLURM.exceptions import CommandExecutionException
 
 source_path = {
-    App.ISSM_MINIAPP_THERMAL: "issm-miniapp/",
-    App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp/",
-    App.ISSM_4_18: "issm-4.18/"
+    App.ISSM_MINIAPP_THERMAL: "issm-miniapp",
+    App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp",
+    App.ISSM_4_18: "issm-4.18"
 }
 executable_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp/bin/miniappthermal.exe",

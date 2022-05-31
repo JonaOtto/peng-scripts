@@ -54,7 +54,7 @@ class BaseBuilder:
                  scorep_flags: str = build_defaults["scorep_flags"],
                  ):
         self.app = app
-        self.source_path = source_path # Relative to home dir, without leading "/"
+        self.source_path = source_path  # Relative to home dir, without leading "/"
         self.compiler = compiler
         self.gcc_version = gcc_version
         self.llvm_version = llvm_version
