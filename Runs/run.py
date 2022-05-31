@@ -303,9 +303,10 @@ class CompilerVectorizationReportRun(BaseRun):
         file_name_all = f"{self.jobname_skeleton}.all"
         path = self.out_path if not vec_out_dir else vec_out_dir
         builder = CompilerVectorizationReportBuilder(app, source_path[app],
-                                                     # path_successful=f"{path}/{file_name_opt}",
-                                                     # path_unsuccessful=f"{path}/{file_name_miss}",
-                                                     path_all=f"{path}/{file_name_all}"
+                                                     path_successful=f"{path}/{file_name_opt}",
+                                                     path_unsuccessful=f"{path}/{file_name_miss}",
+                                                     path_all=f"{path}/{file_name_all}",
+                                                     do_not_export_single_files=True
                                                      )
         self.builder = builder
 
