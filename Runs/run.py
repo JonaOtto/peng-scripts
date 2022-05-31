@@ -109,6 +109,13 @@ class BaseRun:
         pipe_sign = ">" if triangle_pipe else "|"
         self.run_command = f"{self.run_command} {pipe_sign} {to_file_path}"
 
+    def add_run_command_flag(self, flag: str, value):
+        """
+        Adds a flag to the run command.
+        """
+
+        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} -{flag} {value} {self.home_dir}/{executable_path[self.app]} {run_command}"
+
     def __add_execution_command(self, commands):
         """
         Adds a commands to add to execution. Helper: Everything must be in ONE subprocess call, otherwise it messes up env vars.
@@ -208,6 +215,7 @@ class BaseRun:
         """
         Analyze the output.
         """
+        # TODO: Maybe analyze the std out?
         print("Analyzing...")
 
     def do_run(self):
@@ -251,12 +259,25 @@ class GProfRun(BaseRun):
         # add gprof
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = f"{self.out_path}/{file_name}"
-        self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}", bevor=False)
+        # export GMON_OUT_PREFIX
+        self.add_command(f"export GMON_OUT_PREFIX=gmon.out-")
+        # make sure every process knows this env var
+        self.add_run_command_flag(flag="x", value="GMON_OUT_PREFIX")
+        # this produces gmon.out-* files for each process. Sum them:
+        # gprof -s EXEC.exe gmon.out-*
+        self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} gmon.out-*", bevor=False)
+        # use gprof again on the sum file:
+        # gprof EXEC.exe gmon.sum
+        self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} gmon.sum > {self.home_dir}/{self.out_path}/", bevor=False)
 
     def cleanup(self, remove_build: bool = False):
         super().cleanup(remove_build)
-        # remove gmon.out file
-        os.remove(f"{model_setup_path[self.resolution]}/gmon.out")
+        # remove gmon.out files
+        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out-*")
+        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.sum")
+
+    def analyze(self):
+        super().analyze()
 
 
 class CompilerVectorizationReportRun(BaseRun):
