@@ -244,6 +244,7 @@ class GProfRun(BaseRun):
         :param gprof_out_filename: You can give a alternative file name for the gprof output.
         Otherwise, it will be based on the jobname, to adhere to the naming scheme of everything else.
         """
+        self.par_sum = parallel_sum
         builder = GProfBuilder(app, source_path[app])
         super().__init__(app, resolution, builder=builder, *args, **kwargs)
         """
@@ -260,7 +261,7 @@ class GProfRun(BaseRun):
         # add gprof
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = f"{self.out_path}/{file_name}"
-        if parallel_sum:
+        if self.par_sum:
             # export GMON_OUT_PREFIX
             self.add_command(f"export GMON_OUT_PREFIX=gmon.out-")
             # make sure every process knows this env var
@@ -272,13 +273,16 @@ class GProfRun(BaseRun):
             # gprof EXEC.exe gmon.sum
             self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} gmon.sum > {self.home_dir}/{self.out_path}/", bevor=False)
         else:
-            self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} > {self.home_dir}/{self.out_path}/", bevor=False)
+            self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {self.home_dir}/{self.out_path}/", bevor=False)
 
     def cleanup(self, remove_build: bool = False):
         super().cleanup(remove_build)
         # remove gmon.out files
-        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out-*")
-        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.sum")
+        if self.par_sum:
+            os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out-*")
+            os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.sum")
+        else:
+            os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out")
 
     def analyze(self):
         super().analyze()
