@@ -139,13 +139,7 @@ class BaseRun:
         Runs the summarized commands, in ONE subprocess call.
         """
         # put step numbers in output:
-        run_cmd = []
-        n = 1
-        for cmd in self.execution_command:
-            run_cmd.append(f"echo '####################### Step {n} #######################'")
-            run_cmd.append(cmd)
-            n = n + 1
-        self.execution_command = ";".join(run_cmd)
+        self.execution_command = ";".join(self.execution_command)
 
         res = subprocess.run(["bash", "-c", self.execution_command],
                              executable="/bin/bash",
@@ -199,6 +193,7 @@ class BaseRun:
         Runs the whole run.
         """
         self.prepare()
+        raise RuntimeError()
         out_path, error_path = self.run()
         self.cleanup(remove_build=self.cleanup_build)
         print(f"\nOut file: {out_path}")
@@ -233,7 +228,6 @@ class GProfRun(BaseRun):
         # update the job name
         self.add_tool("GPROF")
         # add gprof
-        # super().prepend_run_command(prefix="gprof")
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = self.slurm_configuration.get_out_dir()+file_name
         self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")

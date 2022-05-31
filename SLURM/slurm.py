@@ -475,7 +475,7 @@ class SlurmConfiguration:
         for line in sq.splitlines():
             job_id_squeue, state, time_elapsed = line.split(" ")
             if str(job_id) == job_id_squeue:
-                print(f"Your Job {job_id_squeue} is still {state} (Time spend: {time_elapsed} min).")
+                print(f"Your Job {job_id_squeue} is still {state} (Time spent: {time_elapsed} min).")
                 print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.\n")
                 return False
             if str(job_id) == job_id_squeue and state == "COMPLETI":
