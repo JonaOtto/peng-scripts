@@ -201,10 +201,9 @@ class BaseRun:
         self.prepare()
         out_path, error_path = self.run()
         self.cleanup(remove_build=self.cleanup_build)
-        print(out_path)
-        print(error_path)
+        print(f"\nOut file: {out_path}")
+        print(f"Err file: {error_path}\n")
         self.analyze()
-        return
 
 
 class GProfRun(BaseRun):

@@ -448,16 +448,17 @@ class SlurmConfiguration:
         sbatch_command = ["sbatch", self.__slurm_script_file + ".sh"]
         if not active:
             return " ".join(sbatch_command)
-        try:
-            res = subprocess.run(sbatch_command, stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
-            if res.returncode != 0:
-                raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
-            res = res.stdout.decode("utf-8")
-            res = res.split("Submitted batch job")[1]
-            res = int(res.split(" ")[1])
-            return res
-        except FileNotFoundError:
-            raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)
+        else:
+            try:
+                res = subprocess.run(sbatch_command, stdout=subprocess.PIPE, executable="/bin/bash", env=os.environ.copy())
+                if res.returncode != 0:
+                    raise CommandExecutionException(f"sbatch {self.__slurm_script_file}")
+                res = res.stdout.decode("utf-8")
+                res = res.split("Submitted batch job")[1]
+                res = int(res.split(" ")[1])
+                return res
+            except FileNotFoundError:
+                raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)
 
     def __check_squeue(self, job_id: int) -> bool:
         """
@@ -468,13 +469,19 @@ class SlurmConfiguration:
         # example squeue output
         #      JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMIT PRIORITY    NODES NODELIST(REASON)
         #   28712165 kurs00054 JOB_ISSM jo83xafu  RUNNING       0:24      15:00 13054           1 mpsc0154
-        sq = subprocess.run(["squeue"], stdout=subprocess.PIPE)
-        print(sq.stdout.decode("utf-8"))
-        print(job_id)
-        if str(job_id) not in sq.stdout.decode("utf-8"):
-            return True
-        else:
-            return False
+        #sq = subprocess.run(["squeue"], stdout=subprocess.PIPE)
+        sq = subprocess.run(["bash", "-c", "squeue | awk '{print $1,$5}'"])
+        sq = sq.stdout.decode("utf-8")
+        for line in sq.splitlines():
+            job_id_squeue, state = line.split(" ")
+            if str(job_id) == job_id_squeue:
+                print(f"Your Job {job_id_squeue} is still {state}.")
+                print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.")
+                return False
+            if str(job_id) == job_id_squeue and "COMPLET" in state:
+                print(f"Your Job {job_id_squeue} is COMPLETED.")
+                return True
+        return True
 
     def wait(self, job_id):
         """
