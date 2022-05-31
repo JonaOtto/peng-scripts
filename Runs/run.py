@@ -236,7 +236,7 @@ class GProfRun(BaseRun):
     A run with the tool GProf.
     """
 
-    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None, *args, **kwargs):
+    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None, parallel_sum: bool = False, *args, **kwargs):
         """
         Constructor.
         :param app: The app to use.
@@ -245,8 +245,6 @@ class GProfRun(BaseRun):
         Otherwise, it will be based on the jobname, to adhere to the naming scheme of everything else.
         """
         builder = GProfBuilder(app, source_path[app])
-        print(args)
-        print(kwargs)
         super().__init__(app, resolution, builder=builder, *args, **kwargs)
         """
         From tools.py:
@@ -262,16 +260,19 @@ class GProfRun(BaseRun):
         # add gprof
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = f"{self.out_path}/{file_name}"
-        # export GMON_OUT_PREFIX
-        self.add_command(f"export GMON_OUT_PREFIX=gmon.out-")
-        # make sure every process knows this env var
-        #self.add_run_command_flag(flag="x", value="GMON_OUT_PREFIX")
-        # this produces gmon.out-* files for each process. Sum them:
-        # gprof -s EXEC.exe gmon.out-*
-        self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} gmon.out-*", bevor=False)
-        # use gprof again on the sum file:
-        # gprof EXEC.exe gmon.sum
-        self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} gmon.sum > {self.home_dir}/{self.out_path}/", bevor=False)
+        if parallel_sum:
+            # export GMON_OUT_PREFIX
+            self.add_command(f"export GMON_OUT_PREFIX=gmon.out-")
+            # make sure every process knows this env var
+            self.add_run_command_flag(flag="x", value="GMON_OUT_PREFIX")
+            # this produces gmon.out-* files for each process. Sum them:
+            # gprof -s EXEC.exe gmon.out-*
+            self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} gmon.out-*", bevor=False)
+            # use gprof again on the sum file:
+            # gprof EXEC.exe gmon.sum
+            self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} gmon.sum > {self.home_dir}/{self.out_path}/", bevor=False)
+        else:
+            self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} > {self.home_dir}/{self.out_path}/", bevor=False)
 
     def cleanup(self, remove_build: bool = False):
         super().cleanup(remove_build)
