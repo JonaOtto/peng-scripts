@@ -58,7 +58,8 @@ class BaseRun:
         self.own_build = own_build
         self.runner = runner
         self.home_dir = os.path.expanduser('~')
-        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {self.home_dir}/{executable_path[self.app]} {run_command}"
+        self.default_run_command = run_command
+        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} {self.home_dir}/{executable_path[self.app]} {self.default_run_command}"
         self.cleanup_build = cleanup_build
         self.execution_command = []
         self.jobfile = None
@@ -113,8 +114,7 @@ class BaseRun:
         """
         Adds a flag to the run command.
         """
-
-        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} -{flag} {value} {self.home_dir}/{executable_path[self.app]} {run_command}"
+        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} -{flag} {value} {self.home_dir}/{executable_path[self.app]} {self.default_run_command}"
 
     def __add_execution_command(self, commands):
         """
@@ -159,6 +159,7 @@ class BaseRun:
         # add run command
         self.slurm_configuration.add_command(self.run_command)
         for command in self.__commands_after:
+            print("command: ", command)
             self.slurm_configuration.add_command(command)
         self.slurm_configuration.write_slurm_script()
 
@@ -244,6 +245,8 @@ class GProfRun(BaseRun):
         Otherwise, it will be based on the jobname, to adhere to the naming scheme of everything else.
         """
         builder = GProfBuilder(app, source_path[app])
+        print(args)
+        print(kwargs)
         super().__init__(app, resolution, builder=builder, *args, **kwargs)
         """
         From tools.py:
