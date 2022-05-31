@@ -299,7 +299,7 @@ class CompilerVectorizationReportRun(BaseRun):
         :param app: The app to run.
         :param resolution: The resolution of the model to run.
         :param vec_out_dir: Alternative dir for the out files. Otherwise, it will be constructed off the job name,
-        to adhere to the standard naming scheme. Give with trailing slash!
+        to adhere to the standard naming scheme.
         """
         super().__init__(app, resolution, builder=None, *args, **kwargs)
         # update the job name
@@ -313,14 +313,14 @@ class CompilerVectorizationReportRun(BaseRun):
         path = self.out_path if not vec_out_dir else vec_out_dir
         if not vec_out_dir:
             builder = CompilerVectorizationReportBuilder(app, source_path[app],
-                                                         path_successful=f"{path}{file_name_opt}",
-                                                         path_unsuccessful=f"{path}{file_name_miss}"
+                                                         path_successful=f"{path}/{file_name_opt}",
+                                                         path_unsuccessful=f"{path}/{file_name_miss}"
                                                          )
         else:
             builder = CompilerVectorizationReportBuilder(app, source_path[app],
-                                                         path_successful=f"{path}{file_name_opt}",
-                                                         path_unsuccessful=f"{path}{file_name_miss}",
-                                                         path_all=f"{path}{file_name_all}"
+                                                         path_successful=f"{path}/{file_name_opt}",
+                                                         path_unsuccessful=f"{path}/{file_name_miss}",
+                                                         path_all=f"{path}/{file_name_all}"
                                                          )
         self.builder = builder
 

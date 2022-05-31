@@ -173,7 +173,7 @@ class CompilerVectorizationReportBuilder(BaseBuilder):
     """
     def __init__(self, app: App, source_path: str, path_successful: str, path_unsuccessful: str, path_all: str = None, do_not_export_single_files: bool = False):
         # enable vectorization
-        additional_compiler_flags = "-ftree-vectorize"
+        additional_compiler_flags = "-ftree-vectorize "
         # add out file paths
         if not do_not_export_single_files:
             additional_compiler_flags += f"-fopt-info-vec-optimized={path_successful} -fopt-info-vec-missed={path_unsuccessful}"
