@@ -85,6 +85,7 @@ class BaseRun:
         Adds a tool to the naming scheme.
         """
         self.jobname_skeleton = f"{self.jobname_skeleton}_{name}"
+        self.out_path = f"{default_out_dir}/{self.jobname_skeleton}"
 
     def add_command(self, command: str, bevor: bool = True):
         """
@@ -251,6 +252,11 @@ class GProfRun(BaseRun):
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = f"{self.out_path}/{file_name}"
         self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}", bevor=False)
+
+    def cleanup(self, remove_build: bool = False):
+        super().cleanup(remove_build)
+        # remove gmon.out file
+        os.remove(f"{model_setup_path[self.resolution]}/gmon.out")
 
 
 class CompilerVectorizationReportRun(BaseRun):

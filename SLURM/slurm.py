@@ -463,13 +463,13 @@ class SlurmConfiguration:
         sq = sq.stdout.decode("utf-8")
         for line in sq.splitlines():
             job_id_squeue, state, time_elapsed = line.split(" ")
-            if str(job_id) == job_id_squeue:
+            if str(job_id) == job_id_squeue and "COMP" in state:
+                print(f"Your Job {job_id_squeue} is COMPLETED (Time spend: {time_elapsed} min).\n")
+                return True
+            elif str(job_id) == job_id_squeue:
                 print(f"Your Job {job_id_squeue} is still {state} (Time spent: {time_elapsed} min).")
                 print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.\n")
                 return False
-            if str(job_id) == job_id_squeue and state == "COMPLETI":
-                print(f"Your Job {job_id_squeue} is COMPLETED (Time spend: {time_elapsed} min).\n")
-                return True
         return True
 
     def wait(self, job_id):
