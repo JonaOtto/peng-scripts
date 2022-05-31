@@ -301,14 +301,15 @@ class CompilerVectorizationReportRun(BaseRun):
         :param vec_out_dir: Alternative dir for the out files. Otherwise, it will be constructed off the job name,
         to adhere to the standard naming scheme. Give with trailing slash!
         """
+        super().__init__(app, resolution, builder=None, *args, **kwargs)
+        # update the job name
         tool = "COMPILER-VEC-REPORT"
-        # we have to add the tool here bevor, because we can add it to the runner only if the super call took place,
-        # for this we need the builder first
-        file_name_opt = f"{self.jobname_skeleton}_{tool}.opt"
-        file_name_miss = f"{self.jobname_skeleton}_{tool}.miss"
+        self.add_tool(tool)
+        file_name_opt = f"{self.jobname_skeleton}.opt"
+        file_name_miss = f"{self.jobname_skeleton}.miss"
         file_name_all = None
         if vec_out_dir:
-            file_name_all = f"{self.jobname_skeleton}_{tool}.all"
+            file_name_all = f"{self.jobname_skeleton}.all"
         path = self.out_path if not vec_out_dir else vec_out_dir
         if not vec_out_dir:
             builder = CompilerVectorizationReportBuilder(app, source_path[app],
@@ -321,6 +322,5 @@ class CompilerVectorizationReportRun(BaseRun):
                                                          path_unsuccessful=f"{path}{file_name_miss}",
                                                          path_all=f"{path}{file_name_all}"
                                                          )
-        super().__init__(app, resolution, builder=builder, *args, **kwargs)
-        # update the job name
-        self.add_tool(tool)
+        self.builder = builder
+
