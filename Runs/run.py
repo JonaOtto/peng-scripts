@@ -168,7 +168,7 @@ class BaseRun:
 
     def cleanup(self, remove_build: bool = False):
         # back up job file to the OUT dir
-        subprocess.run(["cp", self.slurm_configuration.get_slurm_file_path() + ".sh", self.slurm_configuration.get_out_dir()])
+        subprocess.run(["cp", self.slurm_configuration.get_slurm_file_path() + ".sh", self.out_path])
         # Clean up job file (leave model dirs clean)
         os.remove(self.slurm_configuration.get_slurm_file_path()+".sh")
         if remove_build:
@@ -176,6 +176,7 @@ class BaseRun:
             os.remove(f"{self.home_dir}/{executable_path[self.app]}")  # the executable
             os.remove(f"{self.home_dir}/{folder}/issm-load.sh")  # issm-load.sh
             os.remove(f"{self.home_dir}/{folder}/issmModule.lua")  # issmMoudle.lua
+            subprocess.run(["bash", "-c", f"rm -r {self.home_dir}/{folder}"])
         if not is_active["build"]:
             self.builder.cleanup_build()
 
@@ -226,7 +227,7 @@ class GProfRun(BaseRun):
         self.add_tool("GPROF")
         # add gprof
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
-        gprof_file = self.slurm_configuration.get_out_dir()+file_name
+        gprof_file = f"{self.out_path}/{file_name}"
         self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")
 
 
@@ -251,7 +252,7 @@ class CompilerVectorizationReportRun(BaseRun):
         file_name_all = None
         if vec_out_dir:
             file_name_all = f"{self.jobname_skeleton}_{tool}.all"
-        path = self.slurm_configuration.get_out_dir() if not vec_out_dir else vec_out_dir
+        path = self.out_path if not vec_out_dir else vec_out_dir
         if not vec_out_dir:
             builder = CompilerVectorizationReportBuilder(app, source_path[app],
                                                          path_successful=f"{path}{file_name_opt}",

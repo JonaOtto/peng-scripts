@@ -211,17 +211,6 @@ class SlurmConfiguration:
         """
         return self.__slurm_script_file
 
-    def get_out_dir(self, out: bool = True) -> str:
-        """
-        Returns the Output directory.
-        :param out: If the std_out based path (true), or the std_err_based dir (false).
-        :return : The directory of the std out or err file, depending on the out parameter.
-        """
-        if out:
-            return "/".join(self.__std_out_path.split("/")[:-1]) + "/"
-        else:
-            return "/".join(self.__std_err_path.split("/")[:-1]) + "/"
-
     def add_module(self, name: str, version: str = None, depends_on: Optional[List[str]] = None) -> None:
         """
         Adds a module to be load from the module system. If this module (same name) was already added, this will
