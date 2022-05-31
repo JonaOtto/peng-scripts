@@ -31,6 +31,7 @@ is_active = {
 default_runner = "mpirun"
 default_executable = "$ISSM_DIR/bin/issm.exe"
 default_run_command = "TransientSolution $PWD PAtransient_std_$FOLDER"
+default_out_dir = "/home/kurse/kurs00054/jo83xafu/OUT"
 
 
 class BaseRun:
@@ -67,9 +68,11 @@ class BaseRun:
         # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
+        self.out_path = f"{default_out_dir}/{self.jobname_skeleton}"
         # Slurm config
         self.slurm_configuration = DefaultPEngSlurmConfig(
             job_name=self.jobname_skeleton,
+            output_directory=default_out_dir,
             job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
             num_mpi_ranks=self.num_mpi_ranks
         )
@@ -103,12 +106,6 @@ class BaseRun:
         """
         Builds the ISSM build.
         """
-        # Slurm config
-        self.slurm_configuration = DefaultPEngSlurmConfig(
-            job_name=self.jobname_skeleton,
-            job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
-            num_mpi_ranks=self.num_mpi_ranks
-        )
         if self.own_build:
             if is_active["build"]:
                 self.builder.prepare_build()

@@ -7,7 +7,7 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
     def __init__(self,
                  job_name: str,
                  output_directory: str = "/home/kurse/kurs00054/jo83xafu/OUT",
-                 job_file_directory: str = "/home/kurse/kurs00054/jo83xafu/jobfile_archive",
+                 job_file_directory: str = "/home/kurse/kurs00054/jo83xafu",
                  num_mpi_ranks: int = 96):
         """
         Constructor.
