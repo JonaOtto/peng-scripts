@@ -271,9 +271,9 @@ class GProfRun(BaseRun):
             self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} gmon.out-*", bevor=False)
             # use gprof again on the sum file:
             # gprof EXEC.exe gmon.sum
-            self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} gmon.sum > {self.home_dir}/{self.out_path}/", bevor=False)
+            self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} gmon.sum > {gprof_file}", bevor=False)
         else:
-            self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {self.out_path}/", bevor=False)
+            self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}", bevor=False)
 
     def cleanup(self, remove_build: bool = False):
         super().cleanup(remove_build)
