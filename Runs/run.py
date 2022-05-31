@@ -215,13 +215,6 @@ class BaseRun:
         if not is_active["build"]:
             self.builder.cleanup_build()
 
-    def analyze(self):
-        """
-        Analyze the output.
-        """
-        # TODO: Maybe analyze the std out?
-        print("Analyzing...")
-
     def do_run(self):
         """
         Runs the whole run.
@@ -231,7 +224,7 @@ class BaseRun:
         self.cleanup(remove_build=self.cleanup_build)
         print(f"\nOut file: {out_path}")
         print(f"Err file: {error_path}\n")
-        self.analyze()
+        return out_path, error_path, out_path
 
 
 class GProfRun(BaseRun):
@@ -286,9 +279,6 @@ class GProfRun(BaseRun):
             os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.sum")
         else:
             os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out")
-
-    def analyze(self):
-        super().analyze()
 
 
 class CompilerVectorizationReportRun(BaseRun):
