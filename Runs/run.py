@@ -114,7 +114,7 @@ class BaseRun:
         """
         Adds a flag to the run command.
         """
-        self.run_command = f"{self.runner} -n {self.num_mpi_ranks} -{flag} {value} {self.home_dir}/{executable_path[self.app]} {self.default_run_command}"
+        self.run_command = f"{self.runner} -{flag} {value} -n {self.num_mpi_ranks} {self.home_dir}/{executable_path[self.app]} {self.default_run_command}"
 
     def __add_execution_command(self, commands):
         """
@@ -265,7 +265,7 @@ class GProfRun(BaseRun):
         # export GMON_OUT_PREFIX
         self.add_command(f"export GMON_OUT_PREFIX=gmon.out-")
         # make sure every process knows this env var
-        self.add_run_command_flag(flag="x", value="GMON_OUT_PREFIX")
+        #self.add_run_command_flag(flag="x", value="GMON_OUT_PREFIX")
         # this produces gmon.out-* files for each process. Sum them:
         # gprof -s EXEC.exe gmon.out-*
         self.add_command(f"gprof -s {self.home_dir}/{executable_path[self.app]} gmon.out-*", bevor=False)
