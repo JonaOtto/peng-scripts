@@ -11,6 +11,7 @@ if __name__ == '__main__':
         app=App.ISSM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000
     )
+    run.do_run()
     print("FINISHED!!!!!")
 
 
