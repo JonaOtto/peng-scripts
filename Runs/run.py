@@ -72,12 +72,13 @@ class BaseRun:
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.out_path = f"{default_out_dir}/{self.jobname_skeleton}"
         # Slurm config
-        self.slurm_configuration = DefaultPEngSlurmConfig(
-            job_name=self.jobname_skeleton,
-            output_directory=default_out_dir,
-            job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
-            num_mpi_ranks=self.num_mpi_ranks
-        )
+        self.slurm_configuration = None
+        # self.slurm_configuration = DefaultPEngSlurmConfig(
+        #     job_name=self.jobname_skeleton,
+        #     output_directory=default_out_dir,
+        #     job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
+        #     num_mpi_ranks=self.num_mpi_ranks
+        # )
 
     def add_tool(self, name: str):
         """
@@ -117,6 +118,12 @@ class BaseRun:
         """
         Builds the ISSM build.
         """
+        self.slurm_configuration = DefaultPEngSlurmConfig(
+            job_name=self.jobname_skeleton,
+            output_directory=default_out_dir,
+            job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
+            num_mpi_ranks=self.num_mpi_ranks
+        )
         if self.own_build:
             if is_active["build"]:
                 self.builder.prepare_build()
@@ -260,7 +267,7 @@ class CompilerVectorizationReportRun(BaseRun):
         :param vec_out_dir: Alternative dir for the out files. Otherwise, it will be constructed off the job name,
         to adhere to the standard naming scheme. Give with trailing slash!
         """
-        tool = "COMPILER_VEC_REPORT"
+        tool = "COMPILER-VEC-REPORT"
         # we have to add the tool here bevor, because we can add it to the runner only if the super call took place,
         # for this we need the builder first
         file_name_opt = f"{self.jobname_skeleton}_{tool}.opt"
