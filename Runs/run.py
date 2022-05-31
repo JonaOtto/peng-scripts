@@ -63,6 +63,8 @@ class BaseRun:
         self.execution_command = []
         self.jobfile = None
         self.builder = builder
+        self.__commands_bevor = []
+        self.__commands_after = []
         if self.builder is None:
             self.builder = BaseBuilder(app, source_path[app])
         # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
@@ -82,6 +84,15 @@ class BaseRun:
         Adds a tool to the naming scheme.
         """
         self.jobname_skeleton = f"{self.jobname_skeleton}_{name}"
+
+    def add_command(self, command: str, bevor: bool = True):
+        """
+        adds a command.
+        """
+        if bevor:
+            self.__commands_bevor.append(command)
+        else:
+            self.__commands_after.append(command)
 
     def prepend_run_command(self, prefix: str):
         """
@@ -128,7 +139,12 @@ class BaseRun:
         else:
             self.__add_execution_command(self.builder.load_modules(active=False))
         # generate job_script:
+        for command in self.__commands_bevor:
+            self.slurm_configuration.add_command(command)
+        # add run command
         self.slurm_configuration.add_command(self.run_command)
+        for command in self.__commands_after:
+            self.slurm_configuration.add_command(command)
         self.slurm_configuration.write_slurm_script()
 
     def __run_passive_commands(self):
@@ -228,7 +244,7 @@ class GProfRun(BaseRun):
         # add gprof
         file_name = f"{self.jobname_skeleton}.profile" if not gprof_out_filename else f"{gprof_out_filename}.profile"
         gprof_file = f"{self.out_path}/{file_name}"
-        self.slurm_configuration.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}")
+        self.add_command(f"gprof {self.home_dir}/{executable_path[self.app]} > {gprof_file}", bevor=False)
 
 
 class CompilerVectorizationReportRun(BaseRun):
