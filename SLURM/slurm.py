@@ -470,16 +470,16 @@ class SlurmConfiguration:
         #      JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMIT PRIORITY    NODES NODELIST(REASON)
         #   28712165 kurs00054 JOB_ISSM jo83xafu  RUNNING       0:24      15:00 13054           1 mpsc0154
         #sq = subprocess.run(["squeue"], stdout=subprocess.PIPE)
-        sq = subprocess.run(["bash", "-c", "squeue | awk '{print $1,$5}'"], stdout=subprocess.PIPE)
+        sq = subprocess.run(["bash", "-c", "squeue | awk '{print $1,$5,$6}'"], stdout=subprocess.PIPE)
         sq = sq.stdout.decode("utf-8")
         for line in sq.splitlines():
-            job_id_squeue, state = line.split(" ")
+            job_id_squeue, state, time_elapsed = line.split(" ")
             if str(job_id) == job_id_squeue:
-                print(f"Your Job {job_id_squeue} is still {state}.")
-                print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.")
+                print(f"Your Job {job_id_squeue} is still {state} (Time spend: {time_elapsed} min).")
+                print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.\n")
                 return False
-            if str(job_id) == job_id_squeue and "COMPLET" in state:
-                print(f"Your Job {job_id_squeue} is COMPLETED.")
+            if str(job_id) == job_id_squeue and state == "COMPLETI":
+                print(f"Your Job {job_id_squeue} is COMPLETED (Time spend: {time_elapsed} min).\n")
                 return True
         return True
 
