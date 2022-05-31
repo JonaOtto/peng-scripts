@@ -188,10 +188,3 @@ class CompilerVectorizationReportBuilder(BaseBuilder):
                          cxx_compiler_flags=f"'{build_defaults['cxx_compiler_flags']} {additional_compiler_flags}'",
                          )
 
-    def prepare_build(self):
-        super().prepare_build()
-        # touch out files, otherwise gcc cannot dump content in it
-        #if not self.do_not_export_single_files:
-        #    if self.path_all:
-        #        subprocess.run(["bash", "-c", f"touch {}"])
-

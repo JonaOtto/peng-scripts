@@ -310,20 +310,12 @@ class CompilerVectorizationReportRun(BaseRun):
         self.add_tool(tool)
         file_name_opt = f"{self.jobname_skeleton}.opt"
         file_name_miss = f"{self.jobname_skeleton}.miss"
-        file_name_all = None
-        if vec_out_dir:
-            file_name_all = f"{self.jobname_skeleton}.all"
+        file_name_all = f"{self.jobname_skeleton}.all"
         path = self.out_path if not vec_out_dir else vec_out_dir
-        if not vec_out_dir:
-            builder = CompilerVectorizationReportBuilder(app, source_path[app],
-                                                         path_successful=f"{path}/{file_name_opt}",
-                                                         path_unsuccessful=f"{path}/{file_name_miss}"
-                                                         )
-        else:
-            builder = CompilerVectorizationReportBuilder(app, source_path[app],
-                                                         path_successful=f"{path}/{file_name_opt}",
-                                                         path_unsuccessful=f"{path}/{file_name_miss}",
-                                                         path_all=f"{path}/{file_name_all}"
-                                                         )
+        builder = CompilerVectorizationReportBuilder(app, source_path[app],
+                                                     # path_successful=f"{path}/{file_name_opt}",
+                                                     # path_unsuccessful=f"{path}/{file_name_miss}",
+                                                     path_all=f"{path}/{file_name_all}"
+                                                     )
         self.builder = builder
 
