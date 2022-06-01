@@ -236,10 +236,12 @@ class ResultAnalyzer:
                 if len(opts) > 5:
                     raise NamingSchemeException(f"Too many items in file name: {file}")
                 if file_job_id:
+                    print(extension)
                     # job std files
                     if job_id not in self.std_files:
                         self.std_files[job_id] = {}
                     if extension == "out":
+                        print(this_file_exp_config.result_file)
                         self.std_files[job_id]["out"] = this_file_exp_config
                     elif extension == "err":
                         self.std_files[job_id]["err"] = this_file_exp_config
@@ -340,7 +342,7 @@ class StdFileAnalyzer(BaseAnalyzer):
                     model_loop_cnt += 1
                 elif line.startswith("   FemModel initialization elapsed time"):
                     self.setup_time = float(line.split(":")[1][3:-1])
-            self.setup_time = self.setup_time * 100
+            self.setup_time = self.setup_time
             self.model_elements_avg = model_elm_sum / model_elm_cnt
             self.model_loops_avg = model_loop_sum / model_loop_cnt
 
