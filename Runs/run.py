@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import Tuple
 
 import SLURM.slurm
 from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder, CompilerVectorizationReportBuilder
@@ -223,7 +224,7 @@ class BaseRun:
         self.jobname_skeleton += f".{job_id}"
         self.out_path += f".{job_id}"
 
-    def do_run(self) -> tuple[str, dict, dict]:
+    def do_run(self) -> Tuple[str, dict, dict]:
         """
         Runs the whole run.
         """

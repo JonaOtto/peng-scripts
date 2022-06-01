@@ -1,5 +1,5 @@
 import os
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from Builder.builder import App, Resolution, Compiler
 from Analyzer.exceptions import *
@@ -173,7 +173,7 @@ class ResultAnalyzer:
     Looks at all output files and calls the matching analyzers.
     """
 
-    def __init__(self, experiments: List[tuple[str, dict, dict]], out_dir: str = default_out_dir):
+    def __init__(self, experiments: List[Tuple[str, dict, dict]], out_dir: str = default_out_dir):
         self.out_dir = out_dir
         # tuple of: the out path, the build config, the job config
         self.experiments = experiments
