@@ -253,6 +253,11 @@ class ResultAnalyzer:
                 elif tool == "GPROF" and extension == "profile":
                     # gprof
                     self.gprof_files["profile"] = this_file_exp_config
+                elif tool == "VANILLA":
+                    # TODO: What to do if vanilla? -> Baseline?
+                    pass
+                else:
+                    continue
         # start the specific analyzers
         if self.std_files is not {}:
             std_analyzer = StdFileAnalyzer(**self.std_files)
