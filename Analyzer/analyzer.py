@@ -1,3 +1,4 @@
+import copy
 import os
 from typing import List, Union, Tuple
 
@@ -215,7 +216,7 @@ class ResultAnalyzer:
             for file in files:
                 print(file)
                 file_path = f"{exp_dir}/{file}"
-                this_file_exp_config = exp_config
+                this_file_exp_config = copy.deepcopy(exp_config)
                 this_file_exp_config.result_file = file_path
                 # split naming scheme
                 # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL/VANILLA][.fileextension][.job_id]
@@ -232,7 +233,7 @@ class ResultAnalyzer:
                 this_file_exp_config.resolution = Resolution.get(resolution)
                 this_file_exp_config.compiler = Compiler.get(compiler)
                 this_file_exp_config.mpi_num_ranks = int(mpi[3:])
-                print(this_file_exp_config)
+                print(this_file_exp_config.result_file)
                 if len(opts) > 5:
                     raise NamingSchemeException(f"Too many items in file name: {file}")
                 if file_job_id:
@@ -268,6 +269,7 @@ class ResultAnalyzer:
                     pass
                 else:
                     continue
+                del this_file_exp_config
         # start the specific analyzers
         if self.std_files is not {}:
             for job_id in self.std_files.keys():
