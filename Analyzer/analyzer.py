@@ -238,20 +238,20 @@ class ResultAnalyzer:
                 if file_job_id:
                     # job std files
                     if extension == "out":
-                        self.std_files["out"] = this_file_exp_config
+                        self.std_files[job_id]["out"] = this_file_exp_config
                     elif extension == "err":
-                        self.std_files["out"] = this_file_exp_config
+                        self.std_files[job_id]["err"] = this_file_exp_config
                     elif extension == "job":
                         # This is the jobfile. Not of interest here
                         continue
                 elif tool == "COMPILER-VEC-REPORT":
                     # CVR
                     if extension == "all":
-                        self.cvr_files["all"] = this_file_exp_config
+                        self.cvr_files[job_id]["all"] = this_file_exp_config
                     elif extension == "opt":
-                        self.cvr_files["opt"] = this_file_exp_config
+                        self.cvr_files[job_id]["opt"] = this_file_exp_config
                     elif extension == "miss":
-                        self.cvr_files["miss"] = this_file_exp_config
+                        self.cvr_files[job_id]["miss"] = this_file_exp_config
                 elif tool == "GPROF" and extension == "profile":
                     # gprof
                     self.gprof_files["profile"] = this_file_exp_config
@@ -262,14 +262,17 @@ class ResultAnalyzer:
                     continue
         # start the specific analyzers
         if self.std_files is not {}:
-            std_analyzer = StdFileAnalyzer(**self.std_files)
-            std_analyzer.analyze()
+            for job_id in self.std_files.keys():
+                std_analyzer = StdFileAnalyzer(job_id, **self.std_files[job_id])
+                std_analyzer.analyze()
         if self.gprof_files is not {}:
-            gprof_analyzer = GProfAnalyzer(**self.gprof_files)
-            gprof_analyzer.analyze()
+            for job_id in self.gprof_files.keys():
+                gprof_analyzer = GProfAnalyzer(job_id, **self.gprof_files)
+                gprof_analyzer.analyze()
         if self.cvr_files is not {}:
-            cvr_analyzer = CompilerVectorizationReportAnalyzer(**self.cvr_files)
-            cvr_analyzer.analyze()
+            for job_id in self.cvr_files.keys():
+                cvr_analyzer = CompilerVectorizationReportAnalyzer(job_id, **self.cvr_files)
+                cvr_analyzer.analyze()
 
 
 ### Base ###
@@ -281,8 +284,8 @@ class BaseAnalyzer:
     If you want to enable some functionality for all specific Analyzers, put it here.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, job_id: int):
+        self.job_id = job_id
 
     def analyze(self):
         pass
@@ -296,18 +299,47 @@ class StdFileAnalyzer(BaseAnalyzer):
     Analyzer for out and err file.
     """
 
-    def __init__(self, out: ExperimentConfig = None, err: ExperimentConfig = None):
+    def __init__(self, job_id: int, out: ExperimentConfig = None, err: ExperimentConfig = None):
         """
         Constructor.
         """
-        super().__init__()
+        super().__init__(job_id)
         self.out_cnf = out
         self.err_cnf = err
+        # results
+        self.model_elements_avg = None
+        self.model_loops_avg = None
+        self.calculation_time = None
+
+    def read_out_file(self, path):
+        """
+        Reads the std_out file.
+        """
+        with open(path, "r") as f:
+            lines = f.readlines()
+            self.calculation_time = float(lines[-3].split(":", 1)[1][1:-1])
+            model_elm_sum = 0.0
+            model_elm_cnt = 0.0
+            model_loop_sum = 0.0
+            model_loop_cnt = 0.0
+            for line in lines:
+                if line.startswith("FemModel"):
+                    model_elm_sum += float(line.split(",", 1)[0][18:-9])
+                    model_elm_cnt += 1
+                elif line.startswith(" -->"):
+                    model_loop_sum += float(line[12:-6])
+                    model_loop_cnt += 1
+            self.model_elements_avg = model_elm_sum/model_elm_cnt
+            self.model_loops_avg = model_loop_sum/model_loop_cnt
 
     def analyze(self):
         print("\n\nANALYZING STD OUT!!")
-        print(self.out_cnf)
-        print(self.err_cnf)
+        if self.out_cnf:
+            self.read_out_file(self.out_cnf.result_file)
+        print(self.calculation_time)
+        print(self.model_elements_avg)
+        print(self.model_loops_avg)
+        return self.calculation_time, self.model_elements_avg, self.model_loops_avg
 
 
 class GProfAnalyzer(BaseAnalyzer):
@@ -315,11 +347,11 @@ class GProfAnalyzer(BaseAnalyzer):
     Analyzer for GProf results.
     """
 
-    def __init__(self, profile: ExperimentConfig, threshold_percentage: float = 5.0):
+    def __init__(self, job_id: int, profile: ExperimentConfig, threshold_percentage: float = 5.0):
         """
         Constructor.
         """
-        super().__init__()
+        super().__init__(job_id)
         self.profile = profile
         self.threshold = threshold_percentage
         self.flat_profile = []
@@ -346,17 +378,17 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
     Analyzer for CVR.
     """
 
-    def __init__(self, all: ExperimentConfig = None, opt: ExperimentConfig = None, miss: ExperimentConfig = None):
+    def __init__(self, job_id: int, all: ExperimentConfig = None, opt: ExperimentConfig = None, miss: ExperimentConfig = None):
         """
         Constructor.
         """
-        super().__init__()
+        super().__init__(job_id)
         self.all_cnf = all
         self.opt_cnf = opt
         self.miss_cnf = miss
 
     def analyze(self):
-        print("\n\nANALYZING STD OUT!!")
+        print("\n\nANALYZING CVR!!")
         print(self.all_cnf)
         print(self.opt_cnf)
         print(self.miss_cnf)

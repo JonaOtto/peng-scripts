@@ -11,7 +11,7 @@ if __name__ == '__main__':
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G64000
     )
-    r = RunSwarm([run1, run2])
+    r = RunSwarm(name="TestSwarm1", runs=[run1, run2])
     r.do_run()
 
     print("FINISHED!!!!!")
