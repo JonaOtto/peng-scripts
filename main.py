@@ -17,8 +17,7 @@ if __name__ == '__main__':
     # timings test run:
     run3 = BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G4000)
     run4 = BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G4000, own_build=False)
-    #r2 = RunSwarm(name="Timing Test", runs=[run3, run4])
-    r2 = RunSwarm(name="Timing Test", runs=[run4])
+    r2 = RunSwarm(name="Timing Test", runs=[run3, run4])
     r2.do_run()
     print("FINISHED!!!!!")
 

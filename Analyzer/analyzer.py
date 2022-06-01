@@ -328,8 +328,6 @@ class StdFileAnalyzer(BaseAnalyzer):
         """
         with open(path, "r") as f:
             lines = f.readlines()
-            print(lines)
-            print(lines[-3])
             self.calculation_time = float(lines[-3].split(":", 1)[1][1:-1])
             model_elm_sum = 0.0
             model_elm_cnt = 0.0
