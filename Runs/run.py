@@ -52,7 +52,7 @@ class BaseRun:
                  runner: str = default_runner,
                  run_command: str = default_run_command,
                  cleanup_build: bool = False,
-                 vanilla: bool = False):
+                 vanilla: bool = True):
         self.app = app
         self.resolution = resolution
         self.compiler = compiler
@@ -258,7 +258,7 @@ class GProfRun(BaseRun):
         self.par_sum = parallel_sum
         builder = GProfBuilder(app, source_path[app])
 
-        super().__init__(app, resolution, builder=builder, *args, **kwargs)
+        super().__init__(app, resolution, builder=builder, vanilla=False, *args, **kwargs)
         """
         From tools.py:
         
@@ -314,7 +314,7 @@ class CompilerVectorizationReportRun(BaseRun):
         if "compiler" in kwargs:
             compiler = kwargs["compiler"]
 
-        super().__init__(app, resolution, builder=None, *args, **kwargs)
+        super().__init__(app, resolution, builder=None, vanilla=False, *args, **kwargs)
         # update the job name
         tool = "COMPILER-VEC-REPORT"
         self.add_tool(tool)
