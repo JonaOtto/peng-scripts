@@ -1,4 +1,6 @@
-import os, subprocess
+import os
+import subprocess
+
 from SLURM.exceptions import CommandExecutionException
 
 
@@ -10,6 +12,17 @@ class App:
     ISSM_MINIAPP_STRESSBALANCE = "ISSM-MINIAPP-STRESSBALANCE"
     ISSM_4_18 = "ISSM-4-18"
 
+    @classmethod
+    def get(self, app_name):
+        if app_name == App.ISSM_MINIAPP_THERMAL:
+            return App.ISSM_MINIAPP_THERMAL
+        elif app_name == App.ISSM_MINIAPP_STRESSBALANCE:
+            return App.ISSM_MINIAPP_STRESSBALANCE
+        elif app_name == App.ISSM_4_18:
+            return App.ISSM_4_18
+        else:
+            raise KeyError("App name not found.")
+
 
 class Resolution:
     """
@@ -19,10 +32,30 @@ class Resolution:
     G16000 = "G1600"
     G64000 = "G64000"
 
+    @classmethod
+    def get(cls, res_name):
+        if res_name == Resolution.G4000:
+            return Resolution.G4000
+        elif res_name == Resolution.G16000:
+            return Resolution.G16000
+        elif res_name == Resolution.G64000:
+            return Resolution.G64000
+        else:
+            raise KeyError("Resolution not found.")
+
 
 class Compiler:
     GCC = "GCC"
     LLVM = "LLVM"
+
+    @classmethod
+    def get(cls, compiler_name):
+        if compiler_name == Compiler.GCC:
+            return Compiler.GCC
+        elif compiler_name == Compiler.LLVM:
+            return Compiler.LLVM
+        else:
+            raise KeyError("Compiler not found.")
 
 
 build_defaults = {
@@ -65,6 +98,21 @@ class BaseBuilder:
         self.scorep_instrumentation = scorep_instrumentation
         self.scorep_flags = scorep_flags
         self.home_dir = os.path.expanduser('~')
+
+    def get_config(self):
+        return {
+            "app": self.app,
+            "source_path": self.source_path,
+            "compiler": self.compiler,
+            "gcc_version": self.gcc_version,
+            "llvm_version": self.llvm_version,
+            "c_compiler_flags": self.c_compiler_flags,
+            "fortran_compiler_flags": self.fortran_compiler_flags,
+            "cxx_compiler_flags": self.cxx_compiler_flags,
+            "petsc_version": self.petsc_version,  # 3.13 and 3.14 are supported
+            "scorep_instrumentation": self.scorep_instrumentation,
+            "scorep_flags": self.scorep_flags
+        }
 
     def prepare_build(self):
         old_dir = os.getcwd()

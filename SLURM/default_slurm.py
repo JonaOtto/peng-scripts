@@ -20,9 +20,9 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
         :param num_mpi_ranks: The number of mpi ranks
         """
         # Manage file names:
-        slurm_script_file = f"{job_file_directory}/{job_name}_JOB"
-        std_out_path = f"{output_directory}/{job_name}/{job_name}_OUT"
-        std_err_path = f"{output_directory}/{job_name}/{job_name}_ERR"
+        slurm_script_file = f"{job_file_directory}/{job_name}"
+        std_out_path = f"{output_directory}/{job_name}/{job_name}.out"
+        std_err_path = f"{output_directory}/{job_name}/{job_name}.err"
 
         # construct it
         super().__init__(slurm_script_file=slurm_script_file,

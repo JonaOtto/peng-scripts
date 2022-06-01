@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import SLURM.slurm
 from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder, CompilerVectorizationReportBuilder
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
@@ -50,7 +51,7 @@ class BaseRun:
                  runner: str = default_runner,
                  run_command: str = default_run_command,
                  cleanup_build: bool = False,
-                 ):
+                 vanilla: bool = False):
         self.app = app
         self.resolution = resolution
         self.compiler = compiler
@@ -68,7 +69,7 @@ class BaseRun:
         self.__commands_after = []
         if self.builder is None:
             self.builder = BaseBuilder(app, source_path[app])
-        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL[...]][OUT.ID/ERR.ID/JOB][.fileextension]
+        # Job name konvention: APP_RESOLUTION_COMPILER_MPI<NUM>[_TOOL/VANILLA][.fileextension][.job_id]
         self.jobname_skeleton = f"{self.app}_{self.resolution}_{self.compiler}_MPI{self.num_mpi_ranks}"
         # this will reflect in the filenames for out, err, and jobscript, and in the actual slurm job name
         self.out_path = f"{default_out_dir}/{self.jobname_skeleton}"
@@ -80,6 +81,9 @@ class BaseRun:
         #     job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
         #     num_mpi_ranks=self.num_mpi_ranks
         # )
+        # if not tool is used add "VANILLA"
+        if vanilla:
+            self.add_tool("VANILLA")
 
     def add_tool(self, name: str):
         """
@@ -201,9 +205,9 @@ class BaseRun:
             job_id = int(res.split(" ")[1].split("\n")[0])
         return self.slurm_configuration.wait(job_id)
 
-    def cleanup(self, remove_build: bool = False):
+    def cleanup(self, job_id: int, remove_build: bool = False):
         # back up job file to the OUT dir
-        subprocess.run(["cp", self.slurm_configuration.get_slurm_file_path() + ".sh", self.out_path])
+        subprocess.run(["cp", f"{self.slurm_configuration.get_slurm_file_path()}.sh", self.out_path])
         # Clean up job file (leave model dirs clean)
         os.remove(self.slurm_configuration.get_slurm_file_path()+".sh")
         if remove_build:
@@ -214,17 +218,25 @@ class BaseRun:
             subprocess.run(["bash", "-c", f"rm -r {self.home_dir}/{folder}"])
         if not is_active["build"]:
             self.builder.cleanup_build()
+        # move results into specific folder with job_id
+        subprocess.run(["bash", "-c", f"mv {self.out_path} {self.out_path}.{job_id}"])
+        self.jobname_skeleton += f".{job_id}"
+        self.out_path += f".{job_id}"
 
-    def do_run(self):
+    def do_run(self) -> tuple[str, dict, dict]:
         """
         Runs the whole run.
         """
         self.prepare()
-        out_path, error_path = self.run()
-        self.cleanup(remove_build=self.cleanup_build)
+        job_id, out_path, error_path = self.run()
+        self.cleanup(job_id=job_id, remove_build=self.cleanup_build)
         print(f"\nOut file: {out_path}")
         print(f"Err file: {error_path}\n")
-        return out_path, error_path, out_path
+        # The run return the needed data for the experiment config:
+        # out path: The path to the OUT-dir
+        # builder config: The specifications of the build, like compiler flags, etc
+        # slurm config: The specifications of the job, like used memory, cpu frequency, ...
+        return self.out_path, self.builder.get_config(), self.slurm_configuration.get_config()
 
 
 class GProfRun(BaseRun):

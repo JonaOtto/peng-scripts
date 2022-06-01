@@ -123,6 +123,7 @@ class SlurmConfiguration:
         and add them if some are missing. Default: True.
         :param use_set_u: If the commands "set -u" should be added to your SLURM job file. Default: False.
         """
+        self.job_id = None
         self.__slurm_script_file = slurm_script_file
         self.__job_name = job_name
         self.__std_out_path = std_out_path
@@ -210,6 +211,21 @@ class SlurmConfiguration:
         Getter for slurm script path.
         """
         return self.__slurm_script_file
+
+    def get_config(self):
+        """
+        Returns the config of the job.
+        """
+        return {
+            "std_out_path": self.__std_out_path,
+            "std_err_path": self.__std_err_path,
+            "time_str": self.__time_str,
+            "mem_per_cpu": self.__mem_per_cpu,
+            "mpi_num_ranks": self.__number_of_cores_per_task,
+            "number_of_tasks": self.__number_of_tasks,
+            "number_of_cores_per_task": self.__number_of_cores_per_task,
+            "cpu_frequency_setting": self.__cpu_frequency_str,
+        }
 
     def add_module(self, name: str, version: str = None, depends_on: Optional[List[str]] = None) -> None:
         """
@@ -323,7 +339,7 @@ class SlurmConfiguration:
             self.__commands.insert(0, "echo '[SlurmConfiguration] STARTING.'")
             self.__commands.append("echo '[SlurmConfiguration] FINISHED.'")
         try:
-            with open(self.__slurm_script_file + ".sh", "w") as f:
+            with open(f"{self.__slurm_script_file}.sh", "w") as f:
 
                 # write header
                 f.write(f"#!{self.__shell}\n\n")
@@ -449,6 +465,7 @@ class SlurmConfiguration:
                 res = res.stdout.decode("utf-8")
                 res = res.split("Submitted batch job")[1]
                 res = int(res.split(" ")[1])
+                self.job_id = res
                 return res
             except FileNotFoundError:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)
@@ -481,7 +498,7 @@ class SlurmConfiguration:
         Wait for the SLURM job to finish execution.
         :return: It will return the paths to the result files of the job.
         """
+        self.job_id = job_id
         while not self.__check_squeue(job_id):
-
             time.sleep(SQUEUE_CHECK_INTERVAL)
-        return f"{self.__std_out_path}.{job_id}", f"{self.__std_err_path}.{job_id}"
+        return self.job_id, f"{self.__std_out_path}.{job_id}", f"{self.__std_err_path}.{job_id}"
