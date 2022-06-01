@@ -214,7 +214,7 @@ class ResultAnalyzer:
             files = os.listdir(exp_dir)
             for file in files:
                 print(file)
-                file_path = f"{self.out_dir}/{file}"
+                file_path = f"{exp_dir}/{file}"
                 this_file_exp_config = exp_config
                 this_file_exp_config.result_file = file_path
                 # split naming scheme
