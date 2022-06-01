@@ -321,6 +321,7 @@ class StdFileAnalyzer(BaseAnalyzer):
         self.model_loops_avg = None
         self.calculation_time = None
         self.setup_time = None
+        self.total_time = None
 
     def read_out_file(self, path):
         """
@@ -342,6 +343,14 @@ class StdFileAnalyzer(BaseAnalyzer):
                     model_loop_cnt += 1
                 elif line.startswith("   FemModel initialization elapsed time"):
                     self.setup_time = float(line.split(":")[1][3:-1])
+                elif line.startswith("   Total elapsed time"):
+                    # : 0 hrs 0 min 47 sec
+                    hours = line.split(":")[1:][1].split(" hrs ")
+                    hours, rest = hours[0], hours[1]
+                    minutes = rest.split("min")
+                    minutes, rest = minutes[0], minutes[1]
+                    seconds = rest.split(" sec")[0]
+                    self.total_time = f"{hours}:{minutes}:{seconds}"
             self.setup_time = self.setup_time
             self.model_elements_avg = model_elm_sum / model_elm_cnt
             self.model_loops_avg = model_loop_sum / model_loop_cnt
