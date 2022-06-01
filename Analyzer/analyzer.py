@@ -361,6 +361,7 @@ class StdFileAnalyzer(BaseAnalyzer):
             self.read_out_file(self.out_cnf.result_file)
         print(f"Calculation Time: {self.calculation_time}")
         print(f"Setup Time: {self.setup_time}")
+        print(f"Total Time: {self.total_time}")
         print(f"Model element count average: {self.model_elements_avg}")
         print(f"Model loop count average: {self.model_loops_avg}")
         return self.calculation_time, self.model_elements_avg, self.model_loops_avg
