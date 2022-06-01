@@ -237,6 +237,8 @@ class ResultAnalyzer:
                     raise NamingSchemeException(f"Too many items in file name: {file}")
                 if file_job_id:
                     # job std files
+                    if job_id not in self.std_files:
+                        self.std_files[job_id] = {}
                     if extension == "out":
                         self.std_files[job_id]["out"] = this_file_exp_config
                     elif extension == "err":
@@ -246,6 +248,8 @@ class ResultAnalyzer:
                         continue
                 elif tool == "COMPILER-VEC-REPORT":
                     # CVR
+                    if job_id not in self.cvr_files:
+                        self.cvr_files[job_id] = {}
                     if extension == "all":
                         self.cvr_files[job_id]["all"] = this_file_exp_config
                     elif extension == "opt":
@@ -254,7 +258,9 @@ class ResultAnalyzer:
                         self.cvr_files[job_id]["miss"] = this_file_exp_config
                 elif tool == "GPROF" and extension == "profile":
                     # gprof
-                    self.gprof_files["profile"] = this_file_exp_config
+                    if job_id not in self.gprof_files:
+                        self.gprof_files[job_id] = {}
+                    self.gprof_files[job_id]["profile"] = this_file_exp_config
                 elif tool == "VANILLA":
                     # TODO: What to do if vanilla? -> Baseline?
                     pass
@@ -310,6 +316,7 @@ class StdFileAnalyzer(BaseAnalyzer):
         self.model_elements_avg = None
         self.model_loops_avg = None
         self.calculation_time = None
+        self.setup_time = None
 
     def read_out_file(self, path):
         """
@@ -329,16 +336,20 @@ class StdFileAnalyzer(BaseAnalyzer):
                 elif line.startswith(" -->"):
                     model_loop_sum += float(line[12:-6])
                     model_loop_cnt += 1
-            self.model_elements_avg = model_elm_sum/model_elm_cnt
-            self.model_loops_avg = model_loop_sum/model_loop_cnt
+                elif line.startswith("   FemModel initialization elapsed time"):
+                    self.setup_time = float(line.split(":")[1][3:-1])
+            self.setup_time = self.setup_time * 100
+            self.model_elements_avg = model_elm_sum / model_elm_cnt
+            self.model_loops_avg = model_loop_sum / model_loop_cnt
 
     def analyze(self):
-        print("\n\nANALYZING STD OUT!!")
+        print(f"\n\nANALYZING STD OUT for job: {self.job_id}")
         if self.out_cnf:
             self.read_out_file(self.out_cnf.result_file)
-        print(self.calculation_time)
-        print(self.model_elements_avg)
-        print(self.model_loops_avg)
+        print(f"Calculation Time: {self.calculation_time}")
+        print(f"Setup Time: {self.setup_time}")
+        print(f"Model element count average: {self.model_elements_avg}")
+        print(f"Model loop count average: {self.model_loops_avg}")
         return self.calculation_time, self.model_elements_avg, self.model_loops_avg
 
 
@@ -378,7 +389,8 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
     Analyzer for CVR.
     """
 
-    def __init__(self, job_id: int, all: ExperimentConfig = None, opt: ExperimentConfig = None, miss: ExperimentConfig = None):
+    def __init__(self, job_id: int, all: ExperimentConfig = None, opt: ExperimentConfig = None,
+                 miss: ExperimentConfig = None):
         """
         Constructor.
         """
