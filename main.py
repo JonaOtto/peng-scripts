@@ -6,6 +6,7 @@ if __name__ == '__main__':
     run1 = GProfRun(
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G64000,
+        own_build=False
     )
     run2 = CompilerVectorizationReportRun(
         app=App.ISSM_MINIAPP_THERMAL,

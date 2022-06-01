@@ -230,7 +230,7 @@ class BaseRun:
         """
         self.prepare()
         job_id, out_path, error_path = self.run()
-        self.cleanup(job_id=job_id, remove_build=self.cleanup_build)
+        self.cleanup(job_id, remove_build=self.cleanup_build)
         print(f"\nOut file: {out_path}")
         print(f"Err file: {error_path}\n")
         # The run return the needed data for the experiment config:

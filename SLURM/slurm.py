@@ -501,4 +501,4 @@ class SlurmConfiguration:
         self.job_id = job_id
         while not self.__check_squeue(job_id):
             time.sleep(SQUEUE_CHECK_INTERVAL)
-        return self.job_id, f"{self.__std_out_path}.{job_id}", f"{self.__std_err_path}.{job_id}"
+        return int(self.job_id), f"{self.__std_out_path}.{job_id}", f"{self.__std_err_path}.{job_id}"
