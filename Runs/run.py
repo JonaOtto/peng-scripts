@@ -238,6 +238,7 @@ class BaseRun:
         # out path: The path to the OUT-dir
         # builder config: The specifications of the build, like compiler flags, etc
         # slurm config: The specifications of the job, like used memory, cpu frequency, ...
+        # neither builder nor slurm know the resolution, we have to add it here
         return self.out_path, self.builder.get_config(), self.slurm_configuration.get_config()
 
 

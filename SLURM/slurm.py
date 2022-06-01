@@ -219,7 +219,7 @@ class SlurmConfiguration:
         return {
             "std_out_path": self.__std_out_path,
             "std_err_path": self.__std_err_path,
-            "time_str": self.__time_str,
+            "job_time_limit": self.__time_str,
             "mem_per_cpu": self.__mem_per_cpu,
             "mpi_num_ranks": self.__number_of_cores_per_task,
             "number_of_tasks": self.__number_of_tasks,

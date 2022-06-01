@@ -32,10 +32,6 @@ class ExperimentConfig:
     def __init__(self, result_file: Union[str, None],
                  job_id: int,
                  source_path: str,
-                 app: App,
-                 resolution: Resolution,
-                 compiler: Compiler,
-                 mpi_num_ranks: int,
                  job_time_limit: str,
                  mem_per_cpu: int,
                  number_of_tasks: int,
@@ -48,6 +44,10 @@ class ExperimentConfig:
                  petsc_version: str,  # 3.13 and 3.14 are supported
                  scorep_instrumentation: bool,
                  scorep_flags: str,
+                 app: App = None,
+                 resolution: Resolution = None,
+                 compiler: Compiler = None,
+                 mpi_num_ranks: int = None,
                  cpu: str = lichtenberg_defaults["cpu"],
                  cpu_cores: int = lichtenberg_defaults["cpu_cores"],
                  cpu_count: int = lichtenberg_defaults["cpu_count"],
@@ -299,13 +299,13 @@ class StdFileAnalyzer(BaseAnalyzer):
         Constructor.
         """
         super().__init__()
-        self.out_file = out
-        self.err_file = err
+        self.out_cnf = out
+        self.err_cnf = err
 
     def analyze(self):
         print("ANALYZING STD OUT!!")
-        print(self.out_file)
-        print(self.err_file)
+        print(self.out_cnf)
+        print(self.err_cnf)
 
 
 class GProfAnalyzer(BaseAnalyzer):
@@ -313,7 +313,7 @@ class GProfAnalyzer(BaseAnalyzer):
     Analyzer for GProf results.
     """
 
-    def __init__(self, profile: str, threshold_percentage: float = 5.0):
+    def __init__(self, profile: ExperimentConfig, threshold_percentage: float = 5.0):
         """
         Constructor.
         """
@@ -349,18 +349,12 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         Constructor.
         """
         super().__init__()
-        self.all_file = all
-        self.opt_file = opt
-        self.miss_file = miss
+        self.all_cnf = all
+        self.opt_cnf = opt
+        self.miss_cnf = miss
 
     def analyze(self):
         print("ANALYZING STD OUT!!")
-        print(self.all_file)
-        print(self.opt_file)
-        print(self.miss_file)
-
-
-### temporary ###
-if __name__ == "__main__":
-    g = GProfAnalyzer("ISSM-MINIAPP-THERMAL_G64000_GCC_MPI96_GPROF.profile")
-    g.analyze()
+        print(self.all_cnf)
+        print(self.opt_cnf)
+        print(self.miss_cnf)
