@@ -202,7 +202,7 @@ class ResultAnalyzer:
             print(experiment)
             print(build_config)
             print(slurm_config)
-            exp_dir = f"{self.out_dir}/{experiment}"
+            exp_dir = f"{experiment}"
             try:
                 experiment, job_id = experiment.split(".", 1)
             except ValueError as e:
@@ -274,9 +274,11 @@ class ResultAnalyzer:
 
 ### Base ###
 
+
 class BaseAnalyzer:
     """
     Analyzer base class.
+    If you want to enable some functionality for all specific Analyzers, put it here.
     """
 
     def __init__(self):
@@ -303,7 +305,7 @@ class StdFileAnalyzer(BaseAnalyzer):
         self.err_cnf = err
 
     def analyze(self):
-        print("ANALYZING STD OUT!!")
+        print("\n\nANALYZING STD OUT!!")
         print(self.out_cnf)
         print(self.err_cnf)
 
@@ -335,7 +337,7 @@ class GProfAnalyzer(BaseAnalyzer):
         """
         self.read_file()
 
-        print("ANALYZING GPROF!!")
+        print("\n\nANALYZING GPROF!!")
         print(self.profile)
 
 
@@ -354,7 +356,7 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         self.miss_cnf = miss
 
     def analyze(self):
-        print("ANALYZING STD OUT!!")
+        print("\n\nANALYZING STD OUT!!")
         print(self.all_cnf)
         print(self.opt_cnf)
         print(self.miss_cnf)

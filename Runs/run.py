@@ -257,6 +257,7 @@ class GProfRun(BaseRun):
         """
         self.par_sum = parallel_sum
         builder = GProfBuilder(app, source_path[app])
+
         super().__init__(app, resolution, builder=builder, *args, **kwargs)
         """
         From tools.py:
@@ -309,6 +310,10 @@ class CompilerVectorizationReportRun(BaseRun):
         :param vec_out_dir: Alternative dir for the out files. Otherwise, it will be constructed off the job name,
         to adhere to the standard naming scheme.
         """
+        compiler = Compiler.GCC
+        if "compiler" in kwargs:
+            compiler = kwargs["compiler"]
+
         super().__init__(app, resolution, builder=None, *args, **kwargs)
         # update the job name
         tool = "COMPILER-VEC-REPORT"
@@ -317,11 +322,13 @@ class CompilerVectorizationReportRun(BaseRun):
         file_name_miss = f"{self.jobname_skeleton}.miss"
         file_name_all = f"{self.jobname_skeleton}.all"
         path = self.out_path if not vec_out_dir else vec_out_dir
+        gcc_flags = True if compiler == Compiler.GCC else False
         builder = CompilerVectorizationReportBuilder(app, source_path[app],
                                                      path_successful=f"{path}/{file_name_opt}",
                                                      path_unsuccessful=f"{path}/{file_name_miss}",
                                                      path_all=f"{path}/{file_name_all}",
-                                                     do_not_export_single_files=True
+                                                     do_not_export_single_files=True,
+                                                     gcc_flags=gcc_flags
                                                      )
         self.builder = builder
 
