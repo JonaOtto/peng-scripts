@@ -5,8 +5,7 @@ if __name__ == '__main__':
     # Run swarm 1
     run1 = GProfRun(
         app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G64000,
-        own_build=False
+        resolution=Resolution.G64000
     )
     run2 = CompilerVectorizationReportRun(
         app=App.ISSM_MINIAPP_THERMAL,
