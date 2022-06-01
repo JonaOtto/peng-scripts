@@ -208,7 +208,8 @@ class BaseRun:
 
     def cleanup(self, job_id: int, remove_build: bool = False):
         # back up job file to the OUT dir
-        subprocess.run(["cp", f"{self.slurm_configuration.get_slurm_file_path()}.sh", self.out_path])
+        slurm_path = self.slurm_configuration.get_slurm_file_path()
+        subprocess.run(["cp", f"{slurm_path}.sh", f"{self.out_path}/{self.jobname_skeleton}.job.{job_id}"])
         # Clean up job file (leave model dirs clean)
         os.remove(self.slurm_configuration.get_slurm_file_path()+".sh")
         if remove_build:

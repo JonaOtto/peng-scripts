@@ -58,6 +58,8 @@ class ExperimentConfig:
                  vector_bits: int = lichtenberg_defaults["vector_bits"],
                  network: str = lichtenberg_defaults["network"],
                  network_speed: int = lichtenberg_defaults["network_speed"],  # GBit/s
+                 *args,  # just pipe more given stuff, to not get an error
+                 **kwargs  # we do not have to use them
                  ):
         self.result_file = result_file
         self.job_id = job_id
