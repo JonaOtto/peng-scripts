@@ -411,17 +411,22 @@ class GProfAnalyzer(BaseAnalyzer):
                     self.flat_profile.append(entry)
                 else:
                     break
-            for j in range(i + 40, len(lines)):
+            j = 0
+            while j in range(i + 40, len(lines)):
                 caller_lines = []
                 m = 0
                 elms = None
+                read = False
                 while "---------" not in lines[j + m]:
                     if lines[j + m].startswith("["):
                         elms = [elm.strip() for elm in lines[j + 1].split("  ") if elm.strip() != ""]
-                        break
-                    else:
+                        read = True
+                    elif not read:
                         caller_lines.append(lines[j+m][:-1].strip())
+                    else:
+                        continue
                     m = m + 1
+                j = j + m
                 print(elms)
                 print(caller_lines)
                 if float(elms[1]) < self.threshold:
@@ -450,6 +455,7 @@ class GProfAnalyzer(BaseAnalyzer):
                         parent_indexes=caller_ids
                     )
                 )
+                j = j + 1
 
     def analyze(self):
         """
