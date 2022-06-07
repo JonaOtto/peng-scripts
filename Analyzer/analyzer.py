@@ -206,7 +206,6 @@ class ResultAnalyzer:
             exp_dir = f"{experiment}"
             try:
                 experiment, job_id = experiment.split(".", 1)
-                job_id = int(job_id)
             except ValueError as e:
                 # in case a run has no job ID in folder name,
                 # this run has not done its cleanup yet, so is still running, or broken.
@@ -274,15 +273,15 @@ class ResultAnalyzer:
         # start the specific analyzers
         if self.std_files is not {}:
             for job_id in self.std_files.keys():
-                std_analyzer = StdFileAnalyzer(job_id, **self.std_files[job_id])
+                std_analyzer = StdFileAnalyzer(int(job_id), **self.std_files[job_id])
                 std_analyzer.analyze()
         if self.gprof_files is not {}:
             for job_id in self.gprof_files.keys():
-                gprof_analyzer = GProfAnalyzer(job_id, **self.gprof_files)
+                gprof_analyzer = GProfAnalyzer(int(job_id), **self.gprof_files)
                 gprof_analyzer.analyze()
         if self.cvr_files is not {}:
             for job_id in self.cvr_files.keys():
-                cvr_analyzer = CompilerVectorizationReportAnalyzer(job_id, **self.cvr_files)
+                cvr_analyzer = CompilerVectorizationReportAnalyzer(int(job_id), **self.cvr_files)
                 cvr_analyzer.analyze()
 
 
