@@ -429,6 +429,7 @@ class GProfAnalyzer(BaseAnalyzer):
                 j = j + m
                 print(elms)
                 print(caller_lines)
+                print("---------")
                 if float(elms[1]) < self.threshold:
                     break
                 caller_ids = []
