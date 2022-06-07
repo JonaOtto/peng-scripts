@@ -393,6 +393,7 @@ class GProfAnalyzer(BaseAnalyzer):
             i = 0
             for i in range(5, len(lines)):
                 line = lines[i][:-1]
+                print(line)
                 if line != "":
                     # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
                     elms = line.split(" ")
@@ -406,7 +407,7 @@ class GProfAnalyzer(BaseAnalyzer):
                         calls_to_this=int(elms[3]),
                         self_ms_calls=float(elms[4]),
                         cumulated_ms_calls=float(elms[5]),
-                        name=" ".join(elms[6:-1])
+                        name=" ".join(elms[6:])
                     )
                     self.flat_profile.append(entry)
                 else:
@@ -418,7 +419,6 @@ class GProfAnalyzer(BaseAnalyzer):
                 elms = None
                 read = False
                 while "---------" not in lines[j + m]:
-                    print(lines[j+m])
                     if lines[j + m].startswith("["):
                         print("start [:")
                         print(lines[j + m])
@@ -442,11 +442,11 @@ class GProfAnalyzer(BaseAnalyzer):
                         start = True
                         caller_ids.append(None)
                         called = None
-                        name = " ".join(elms[4:-1])
+                        name = " ".join(elms[4:])
                     else:
                         caller_ids.append(int(caller_line.split("[")[1][:-1]))
                         called = float(elms[4])
-                        name = " ".join(elms[5:-1])
+                        name = " ".join(elms[5:])
                 # [1]     98.1    0.00   50.61                 execute(int, char**, int, int, void (*)(FemModel*)) [1]
                 self.call_graph.append(
                     _CallGraphNode(
