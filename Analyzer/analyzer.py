@@ -391,7 +391,7 @@ class GProfAnalyzer(BaseAnalyzer):
         with open(path, "r") as f:
             lines = f.readlines()
             i = 0
-            for i in range(5, len(lines)):
+            for i in range(4, len(lines)):
                 line = lines[i][:-1]
                 if line != "":
                     # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
@@ -418,10 +418,15 @@ class GProfAnalyzer(BaseAnalyzer):
                 elms = None
                 read = False
                 while "---------" not in lines[j + m]:
+                    print(lines[j+m])
                     if lines[j + m].startswith("["):
+                        print("start [:")
+                        print(lines[j + m])
                         elms = [elm.strip() for elm in lines[j + 1].split(" ") if elm.strip() != ""]
                         read = True
                     elif not read:
+                        print("begginning line")
+                        print(lines[j + m])
                         caller_lines.append(lines[j+m][:-1].strip())
                     m = m + 1
                 j = j + m
