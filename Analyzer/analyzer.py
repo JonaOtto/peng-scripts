@@ -423,8 +423,6 @@ class GProfAnalyzer(BaseAnalyzer):
                         read = True
                     elif not read:
                         caller_lines.append(lines[j+m][:-1].strip())
-                    else:
-                        continue
                     m = m + 1
                 j = j + m
                 print(elms)
