@@ -391,7 +391,7 @@ class GProfAnalyzer(BaseAnalyzer):
         with open(path, "r") as f:
             lines = f.readlines()
             i = 0
-            for i in range(4, len(lines)):
+            for i in range(5, len(lines)):
                 line = lines[i][:-1]
                 if line != "":
                     # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
