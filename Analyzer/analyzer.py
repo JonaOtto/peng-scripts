@@ -428,8 +428,10 @@ class GProfAnalyzer(BaseAnalyzer):
                 if float(elms[1]) < self.threshold:
                     break
                 caller_ids = []
+                start = False
                 for caller_line in caller_lines:
-                    if caller_line == "<spontaneous>":
+                    if caller_line == "<spontaneous>" or start:
+                        start = True
                         caller_ids.append(None)
                         called = None
                         name = elms[4]
