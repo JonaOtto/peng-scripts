@@ -422,7 +422,7 @@ class GProfAnalyzer(BaseAnalyzer):
                     if lines[j + m].startswith("["):
                         print("start [:")
                         print(lines[j + m])
-                        elms = [elm.strip() for elm in lines[j + 1].split(" ") if elm.strip() != ""]
+                        elms = [elm.strip() for elm in lines[j + m].split(" ") if elm.strip() != ""]
                         read = True
                     elif not read:
                         print("begginning line")
