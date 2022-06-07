@@ -277,7 +277,7 @@ class ResultAnalyzer:
                 std_analyzer.analyze()
         if self.gprof_files is not {}:
             for job_id in self.gprof_files.keys():
-                gprof_analyzer = GProfAnalyzer(int(job_id), **self.gprof_files)
+                gprof_analyzer = GProfAnalyzer(int(job_id), **self.gprof_files[job_id])
                 gprof_analyzer.analyze()
         if self.cvr_files is not {}:
             for job_id in self.cvr_files.keys():
