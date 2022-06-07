@@ -421,12 +421,12 @@ class GProfAnalyzer(BaseAnalyzer):
                 while "---------" not in lines[j + m]:
                     if lines[j + m].startswith("["):
                         print("start [:")
-                        print(lines[j + m])
+                        print(lines[j + m][:-1])
                         elms = [elm.strip() for elm in lines[j + m].split(" ") if elm.strip() != ""]
                         read = True
                     elif not read:
                         print("begginning line")
-                        print(lines[j + m])
+                        print(lines[j + m][:-1])
                         caller_lines.append(lines[j+m][:-1].strip())
                     m = m + 1
                 j = j + m
