@@ -388,65 +388,66 @@ class GProfAnalyzer(BaseAnalyzer):
         """
         Reads the profile file into variables.
         """
-        try:
-            with open(path, "r") as f:
-                lines = f.readlines()
-                i = 0
-                for i in range(5, len(lines)):
-                    line = lines[i][:-1]
-                    if line != "":
-                        # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
-                        elms = line.split(" ")
-                        elms = [elm.strip() for elm in elms]
-                        if float(elms[0]) < self.threshold:
-                            continue
-                        entry = _FlatProfileEntry(
-                            percentage_total=float(elms[0]),
-                            cumulated_secs=float(elms[1]),
-                            self_secs=float(elms[2]),
-                            calls_to_this=int(elms[3]),
-                            self_ms_calls=float(elms[4]),
-                            cumulated_ms_calls=float(elms[5]),
-                            name=elms[6]
-                        )
-                        self.flat_profile.append(entry)
-                    else:
-                        break
-                for j in range(i + 40, len(lines)):
-                    caller_lines = []
-                    m = 0
-                    elms = None
-                    while "---------" not in lines[j + m]:
-                        if lines[j + m].startswith("["):
-                            elms = [elm.strip() for elm in line[j + 1].split(" ")]
-                        else:
-                            caller_lines.append(lines[j+m][:-1].strip())
-                    if float(elms[1]) < self.threshold:
-                        break
-                    caller_ids = []
-                    for caller_line in caller_lines:
-                        if caller_line == "<spontaneous>":
-                            caller_ids.append(None)
-                            called = None
-                            name = elms[4]
-                        else:
-                            caller_ids.append(int(caller_line.split("[")[1][:-1]))
-                            called = float(elms[4])
-                            name = elms[5]
-                    # [1]     98.1    0.00   50.61                 execute(int, char**, int, int, void (*)(FemModel*)) [1]
-                    self.call_graph.append(
-                        _CallGraphNode(
-                            index=int(elms[0][1:-1]),
-                            total_time_percentage=float(elms[1]),
-                            self_time=float(elms[2]),
-                            child_time=float(elms[3]),
-                            called=called,
-                            name=name,
-                            parent_indexes=caller_ids
-                        )
+        with open(path, "r") as f:
+            lines = f.readlines()
+            i = 0
+            for i in range(5, len(lines)):
+                line = lines[i][:-1]
+                print(line)
+                if line != "":
+                    # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
+                    elms = line.split(" ")
+                    elms = [elm.strip() for elm in elms]
+                    print(elms)
+                    if float(elms[0]) < self.threshold:
+                        continue
+                    entry = _FlatProfileEntry(
+                        percentage_total=float(elms[0]),
+                        cumulated_secs=float(elms[1]),
+                        self_secs=float(elms[2]),
+                        calls_to_this=int(elms[3]),
+                        self_ms_calls=float(elms[4]),
+                        cumulated_ms_calls=float(elms[5]),
+                        name=elms[6]
                     )
-        except Exception as e:
-            print(f"Exception while reading gprof file: {type(e)}: {e}")
+                    self.flat_profile.append(entry)
+                else:
+                    break
+            for j in range(i + 40, len(lines)):
+                caller_lines = []
+                m = 0
+                elms = None
+                while "---------" not in lines[j + m]:
+                    if lines[j + m].startswith("["):
+                        elms = [elm.strip() for elm in line[j + 1].split(" ")]
+                    else:
+                        caller_lines.append(lines[j+m][:-1].strip())
+                print(elms)
+                print(caller_lines)
+                if float(elms[1]) < self.threshold:
+                    break
+                caller_ids = []
+                for caller_line in caller_lines:
+                    if caller_line == "<spontaneous>":
+                        caller_ids.append(None)
+                        called = None
+                        name = elms[4]
+                    else:
+                        caller_ids.append(int(caller_line.split("[")[1][:-1]))
+                        called = float(elms[4])
+                        name = elms[5]
+                # [1]     98.1    0.00   50.61                 execute(int, char**, int, int, void (*)(FemModel*)) [1]
+                self.call_graph.append(
+                    _CallGraphNode(
+                        index=int(elms[0][1:-1]),
+                        total_time_percentage=float(elms[1]),
+                        self_time=float(elms[2]),
+                        child_time=float(elms[3]),
+                        called=called,
+                        name=name,
+                        parent_indexes=caller_ids
+                    )
+                )
 
     def analyze(self):
         """
