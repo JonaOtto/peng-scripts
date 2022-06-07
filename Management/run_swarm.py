@@ -11,13 +11,18 @@ class RunSwarm:
     Put jobs in a Swarm you want to compare with each other.
     This class opens the same interface as a Run, so call "do_run()" to start it.
     """
-    def __init__(self, name, runs: List[BaseRun]):
+    def __init__(self, name, runs=None):
         """
         Constructor.
         """
+        if runs is None:
+            runs = []
         self.name = name
         self.runs = runs
         self.__run_res_tuples = []
+
+    def add_run(self, run: BaseRun):
+        self.runs.append(run)
 
     def do_run(self):
         """

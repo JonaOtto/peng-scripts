@@ -7,7 +7,7 @@ from typing import Optional, List, Union
 
 from SLURM.exceptions import ModuleDependencyConflict, ScriptNotFoundException, CommandExecutionException
 
-SQUEUE_CHECK_INTERVAL = 20
+SQUEUE_CHECK_INTERVAL = 60
 
 
 class MailType:
