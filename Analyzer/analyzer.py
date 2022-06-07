@@ -422,6 +422,7 @@ class GProfAnalyzer(BaseAnalyzer):
                         elms = [elm.strip() for elm in line[j + 1].split(" ") if elm.strip() != ""]
                     else:
                         caller_lines.append(lines[j+m][:-1].strip())
+                    m = m + 1
                 print(elms)
                 print(caller_lines)
                 if float(elms[1]) < self.threshold:
