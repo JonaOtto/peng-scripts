@@ -13,6 +13,7 @@ if __name__ == '__main__':
         resolution=Resolution.G16000,
         own_build=False
     ))
+    r.do_run()
     # r.add_run(GProfRun(
     #     app=App.ISSM_MINIAPP_THERMAL,
     #     resolution=Resolution.G64000,
