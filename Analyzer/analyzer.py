@@ -395,7 +395,7 @@ class GProfAnalyzer(BaseAnalyzer):
                 line = lines[i][:-1]
                 if line != "":
                     # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
-                    elms = line.split(" ")
+                    elms = line.split("  ")
                     elms = [elm.strip() for elm in elms if elm.strip() != ""]
                     if float(elms[0]) < self.threshold:
                         continue
@@ -411,8 +411,8 @@ class GProfAnalyzer(BaseAnalyzer):
                     self.flat_profile.append(entry)
                 else:
                     break
-            j = 0
-            while j in range(i + 40, len(lines)):
+            j = i + 40
+            while j < len(lines):
                 caller_lines = []
                 m = 0
                 elms = None
