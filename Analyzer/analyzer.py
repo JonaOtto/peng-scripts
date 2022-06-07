@@ -419,7 +419,7 @@ class GProfAnalyzer(BaseAnalyzer):
                 elms = None
                 while "---------" not in lines[j + m]:
                     if lines[j + m].startswith("["):
-                        elms = [elm.strip() for elm in lines[j + 1].split(" ") if elm.strip() != ""]
+                        elms = [elm.strip() for elm in lines[j + 1].split("  ") if elm.strip() != ""]
                     else:
                         caller_lines.append(lines[j+m][:-1].strip())
                     m = m + 1
