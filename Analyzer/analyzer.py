@@ -419,7 +419,7 @@ class GProfAnalyzer(BaseAnalyzer):
                 read = False
                 while "---------" not in lines[j + m]:
                     if lines[j + m].startswith("["):
-                        elms = [elm.strip() for elm in lines[j + 1].split("  ") if elm.strip() != ""]
+                        elms = [elm.strip() for elm in lines[j + 1].split(" ") if elm.strip() != ""]
                         read = True
                     elif not read:
                         caller_lines.append(lines[j+m][:-1].strip())
@@ -437,11 +437,11 @@ class GProfAnalyzer(BaseAnalyzer):
                         start = True
                         caller_ids.append(None)
                         called = None
-                        name = elms[4]
+                        name = " ".join(elms[4:-1])
                     else:
                         caller_ids.append(int(caller_line.split("[")[1][:-1]))
                         called = float(elms[4])
-                        name = elms[5]
+                        name = " ".join(elms[5:-1])
                 # [1]     98.1    0.00   50.61                 execute(int, char**, int, int, void (*)(FemModel*)) [1]
                 self.call_graph.append(
                     _CallGraphNode(
