@@ -206,6 +206,7 @@ class ResultAnalyzer:
             exp_dir = f"{experiment}"
             try:
                 experiment, job_id = experiment.split(".", 1)
+                job_id = int(job_id)
             except ValueError as e:
                 # in case a run has no job ID in folder name,
                 # this run has not done its cleanup yet, so is still running, or broken.
