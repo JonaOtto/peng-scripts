@@ -395,7 +395,7 @@ class GProfAnalyzer(BaseAnalyzer):
                 line = lines[i][:-1]
                 if line != "":
                     # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
-                    elms = line.split("  ")
+                    elms = line.split(" ")
                     elms = [elm.strip() for elm in elms if elm.strip() != ""]
                     if float(elms[0]) < self.threshold:
                         continue
@@ -406,7 +406,7 @@ class GProfAnalyzer(BaseAnalyzer):
                         calls_to_this=int(elms[3]),
                         self_ms_calls=float(elms[4]),
                         cumulated_ms_calls=float(elms[5]),
-                        name=elms[6]
+                        name=" ".join(elms[6:-1])
                     )
                     self.flat_profile.append(entry)
                 else:
@@ -462,13 +462,13 @@ class GProfAnalyzer(BaseAnalyzer):
         """
         Analyze the results.
         """
+        print("\n\nANALYZING GPROF!!")
         if self.profile:
             self.read_profile_file(self.profile.result_file)
         for e in self.flat_profile:
             print(e.name, e.percentage_total)
         for e in self.call_graph:
             print(e.index, e.name, e.total_time_percentage)
-        print("\n\nANALYZING GPROF!!")
         print(self.profile)
 
 
