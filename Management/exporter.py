@@ -24,4 +24,4 @@ class Exporter:
         Run the exporter.
         """
         with open(self.out_file, "w") as f:
-            f.write(json.dumps(self.results))
+            f.write(json.dumps(self.results, indent=4))
