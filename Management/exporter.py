@@ -25,7 +25,7 @@ class Exporter:
         while os.path.isdir(f"{self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}"):
             print(f"{self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix} is present")
             self.suffix = self.suffix + 1
-        print(f"Using: {self.home_dir}//{default_out_dir}{self.experiment_name}-{self.suffix}")
+        print(f"Using: {self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}")
         res = subprocess.run(["mkdir", "-p", f"{self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}"])
         if not res.returncode == 0:
             raise CommandExecutionException(f"mkdir -p {self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}")
