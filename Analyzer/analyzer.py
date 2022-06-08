@@ -509,15 +509,26 @@ class GProfAnalyzer(BaseAnalyzer):
                     elms = [elm.strip() for elm in elms if elm.strip() != ""]
                     if float(elms[0]) < self.threshold:
                         continue
-                    entry = _FlatProfileEntry(
-                        percentage_total=float(elms[0]),
-                        cumulated_secs=float(elms[1]),
-                        self_secs=float(elms[2]),
-                        calls_to_this=int(elms[3]),
-                        self_ms_calls=float(elms[4]),
-                        cumulated_ms_calls=float(elms[5]),
-                        name=" ".join(elms[6:])
-                    )
+                    if len(elms) >= 6:
+                        entry = _FlatProfileEntry(
+                            percentage_total=float(elms[0]),
+                            cumulated_secs=float(elms[1]),
+                            self_secs=float(elms[2]),
+                            calls_to_this=int(elms[3]),
+                            self_ms_calls=float(elms[4]),
+                            cumulated_ms_calls=float(elms[5]),
+                            name=" ".join(elms[6:])
+                        )
+                    else:
+                        entry = _FlatProfileEntry(
+                            percentage_total=float(elms[0]),
+                            cumulated_secs=float(elms[1]),
+                            self_secs=float(elms[2]),
+                            calls_to_this=None,
+                            self_ms_calls=None,
+                            cumulated_ms_calls=None,
+                            name=" ".join(elms[3:])
+                        )
                     self.flat_profile.append(entry)
                 else:
                     break
