@@ -452,10 +452,40 @@ class StdFileAnalyzer(BaseAnalyzer):
             self.model_elements_avg = model_elm_sum / model_elm_cnt
             self.model_loops_avg = model_loop_sum / model_loop_cnt
 
+    def read_out_file_418(self, result_file):
+        """
+        Reads the std_out file of real 4.18 issm app.
+        """
+        with open(path, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("   FemModel initialization elapsed time"):
+                    self.setup_time = float(line.split(":")[1].strip())
+                elif line.startswith("   Total Core solution elapsed time"):
+                    self.calculation_time = float(line.split(":")[1].strip())
+                elif line.startswith("   Total elapsed time"):
+                    # : 0 hrs 0 min 47 sec
+                    hours = line.split(":")[1].split(" hrs ")
+                    hours, rest = int(hours[0]), hours[1]
+                    minutes = rest.split(" min ")
+                    minutes, rest = int(minutes[0]), minutes[1]
+                    seconds = int(rest.split(" sec")[0])
+                    if len(str(hours)) == 1:
+                        hours = f"0{hours}"
+                    if len(str(minutes)) == 1:
+                        minutes = f"0{minutes}"
+                    if len(str(seconds)) == 1:
+                        seconds = f"0{seconds}"
+                    self.total_time = f"{hours}:{minutes}:{seconds}"
+
+
     def analyze(self):
         print(f"\n\nANALYZING STD OUT for job: {self.job_id}")
         if self.out_cnf:
-            self.read_out_file(self.out_cnf.result_file)
+            if self.out_cnf.app != App.ISSM_4_18:
+                self.read_out_file(self.out_cnf.result_file)
+            else:
+                self.read_out_file_418(self.out_cnf.result_file)
         print(f"Calculation Time: {self.calculation_time}")
         print(f"Setup Time: {self.setup_time}")
         print(f"Total Time: {self.total_time}")

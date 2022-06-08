@@ -26,9 +26,10 @@ model_setup_path = {
 }
 is_active = {
     "build": True,
-    "load_modules": False,
-    "run": False,
-}  # analyze and cleanup are after this: there are "active" bey default.
+    "load_modules": True,  # False
+    "run": True,  # False
+}  # analyze and cleanup are after this: there are "active" by default.
+
 # mpirun -n 96 $ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER
 default_runner = "mpirun"
 default_executable = "$ISSM_DIR/bin/issm.exe"
