@@ -452,7 +452,7 @@ class StdFileAnalyzer(BaseAnalyzer):
             self.model_elements_avg = model_elm_sum / model_elm_cnt
             self.model_loops_avg = model_loop_sum / model_loop_cnt
 
-    def read_out_file_418(self, result_file):
+    def read_out_file_418(self, path):
         """
         Reads the std_out file of real 4.18 issm app.
         """
@@ -477,7 +477,6 @@ class StdFileAnalyzer(BaseAnalyzer):
                     if len(str(seconds)) == 1:
                         seconds = f"0{seconds}"
                     self.total_time = f"{hours}:{minutes}:{seconds}"
-
 
     def analyze(self):
         print(f"\n\nANALYZING STD OUT for job: {self.job_id}")
