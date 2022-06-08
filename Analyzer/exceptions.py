@@ -18,3 +18,12 @@ class NamingSchemeException(AnalyzerBaseException):
     """
     def __init__(self, message):
         super(NamingSchemeException, self).__init__(message)
+
+
+class StaticEnvironmentException(AnalyzerBaseException):
+    """
+    Exception for unequal configs.
+    """
+    def __init__(self, message):
+        super(StaticEnvironmentException, self).__init__(message)
+

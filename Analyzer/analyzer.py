@@ -1,6 +1,6 @@
 import copy
 import os
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Callable
 
 from Builder.builder import App, Resolution, Compiler
 from Analyzer.exceptions import *
@@ -95,11 +95,10 @@ class ExperimentConfig:
     def is_comparable(self, other):
         """
         Check if a ExperimentConfig is comparable with another. This means everything should be equal but the
-        result_file and the job_id.
+        result_file, job_id, source_path and the compiler flags.
         There may be cases where it is useful to have other "equal" definitions. They must be implemented on their own.
         """
         return \
-            self.source_path == other.source_path and \
             self.app == other.app and \
             self.resolution == other.resolution and \
             self.compiler == other.compiler and \
@@ -110,9 +109,6 @@ class ExperimentConfig:
             self.cpu_frequency_setting == other.cpu_frequency_setting and \
             self.gcc_version == other.gcc_version and \
             self.llvm_version == other.llvm_version and \
-            self.c_compiler_flags == other.c_compiler_flags and \
-            self.fortran_compiler_flags == other.fortran_compiler_flags and \
-            self.cxx_compiler_flags == other.cxx_compiler_flags and \
             self.petsc_version == other.petsc_version and \
             self.scorep_instrumentation == other.scorep_instrumentation and \
             self.scorep_flags == other.scorep_flags and \
@@ -126,6 +122,36 @@ class ExperimentConfig:
             self.vector_bits == other.vector_bits and \
             self.network == other.network and \
             self.network_speed == other.network_speed
+
+    def as_dict(self):
+        return {
+            "app": self.app,
+            "resolution": self.resolution,
+            "compiler": self.compiler,
+            "mpi_num_ranks": self.mpi_num_ranks,
+            "job_time_limit": self.job_time_limit,
+            "mem_per_cpu": self.mem_per_cpu,
+            "number_of_tasks": self.number_of_tasks,
+            "cpu_frequency_setting": self.cpu_frequency_setting,
+            "gcc_version": self.gcc_version,
+            "llvm_version": self.llvm_version,
+            "c_compiler_flags": self.c_compiler_flags,
+            "fortran_compiler_flags": self.fortran_compiler_flags,
+            "cxx_compiler_flags": self.cxx_compiler_flags,
+            "petsc_version": self.petsc_version,
+            "scorep_instrumentation": self.scorep_instrumentation,
+            "scorep_flags": self.scorep_flags,
+            "cpu": self.cpu,
+            "cpu_cores": self.cpu_cores,
+            "cpu_count": self.cpu_count,
+            "node_mem": self.node_mem,
+            "mem_type": self.mem_type,
+            "mem_frequency": self.mem_frequency,
+            "vector_type": self.vector_type,
+            "vector_bits": self.vector_bits,
+            "network": self.network,
+            "network_speed": self.network_speed
+        }
 
     def __eq__(self, other):
         """
@@ -149,6 +175,16 @@ class _FlatProfileEntry:
         self.cumulated_ms_calls = cumulated_ms_calls
         self.name = name
 
+    def as_dict(self):
+        return {
+            "percentage_total": self.percentage_total,
+            "cumulated_seconds": self.cumulated_secs,
+            "individual_seconds": self.self_secs,
+            "number_of_calls_to_this": self.calls_to_this,
+            "cumulated_milliseconds_per_call": self.cumulated_ms_calls,
+            "individual_milliseconds_per_call": self.self_ms_calls,
+        }
+
 
 class _CallGraphNode:
     """
@@ -167,6 +203,17 @@ class _CallGraphNode:
         self.name = name
         self.parent_indexes = parent_indexes
 
+    def as_dict(self):
+        return {
+            "identifier": self.index,
+            "total_percentage_of_time": self.total_time_percentage,
+            "individual_time": self.self_time,
+            "in_children_time": self.child_time,
+            "number_of_calls_to_this": self.called,
+            "name": self.name,
+            "parent_indexes": self.parent_indexes
+        }
+
 
 ### Result Analyzer ###
 
@@ -176,10 +223,13 @@ class ResultAnalyzer:
     Looks at all output files and calls the matching analyzers.
     """
 
-    def __init__(self, experiments: List[Tuple[str, dict, dict]], out_dir: str = default_out_dir):
+    def __init__(self, experiments: List[Tuple[str, dict, dict]], out_dir: str = default_out_dir, config_equal_f:
+                 Callable[[ExperimentConfig, ExperimentConfig], bool] = None):
         self.out_dir = out_dir
         # tuple of: the out path, the build config, the job config
         self.experiments = experiments
+        # callable for config comparison
+        self.config_equal_f = config_equal_f
         # possible result files: dict of identifier, ExperimentConfig
         self.std_files = {
             # out
@@ -193,6 +243,8 @@ class ResultAnalyzer:
             # miss
             # all
         }
+
+        self.results = {}
 
     def analyze(self):
         """
@@ -271,19 +323,60 @@ class ResultAnalyzer:
                     continue
                 del this_file_exp_config
         # start the specific analyzers
+        all_configs = []
+        if self.std_files is not {}:
+            for job_id in self.std_files.keys():
+                for config in self.std_files[job_id].values():
+                    all_configs.append(config)
+        if self.gprof_files is not {}:
+            for job_id in self.gprof_files.keys():
+                for config in self.gprof_files[job_id].values():
+                    all_configs.append(config)
+        if self.cvr_files is not {}:
+            for job_id in self.cvr_files.keys():
+                for config in self.cvr_files[job_id].values():
+                    all_configs.append(config)
+        all_equal = True
+        for i in range(len(all_configs) - 1):
+            if not self.config_equal_f:
+                if self.config_equal_f(all_configs[i], all_configs[i + 1]):
+                    all_equal = False
+                    raise StaticEnvironmentException("Configs of experiment are not equal!")
+            else:
+                if all_configs[i] != all_configs[i + 1]:
+                    all_equal = False
+                    raise StaticEnvironmentException("Configs of experiment are not equal!")
+        if all_equal:
+            self.results["environment"] = {}
+            self.results["environment"]["is_static"] = True
+            self.results["environment"]["static_environment"] = all_configs[0].as_dict()
+        self.results["jobs"] = {}
+        self.results["results"] = {}
+        # TODO compare result data?
         if self.std_files is not {}:
             for job_id in self.std_files.keys():
                 std_analyzer = StdFileAnalyzer(int(job_id), **self.std_files[job_id])
-                std_analyzer.analyze()
+                job_id, configs, results = std_analyzer.analyze()
+                self.results["jobs"][f"{job_id}"] = {"analyzed": []}
+                for name, cnf in configs.items():
+                    self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
+                self.results["results"][f"{job_id}"] = {}
+                self.results["results"][f"{job_id}"].update(results)
         if self.gprof_files is not {}:
             for job_id in self.gprof_files.keys():
                 gprof_analyzer = GProfAnalyzer(int(job_id), **self.gprof_files[job_id])
-                gprof_analyzer.analyze()
+                job_id, configs, results = gprof_analyzer.analyze()
+                self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{configs.itmes()[0][0]}": configs.itmes()[0][1].result_file})
+                self.results["results"][f"{job_id}"].update(results)
         if self.cvr_files is not {}:
             for job_id in self.cvr_files.keys():
                 cvr_analyzer = CompilerVectorizationReportAnalyzer(int(job_id), **self.cvr_files)
-                cvr_analyzer.analyze()
-
+                job_id, configs, results = cvr_analyzer.analyze()
+                for name, cnf in configs.items():
+                    self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
+                self.results["results"][f"{job_id}"].update(results)
+        print(self.results)
+        return self.results
 
 ### Base ###
 
@@ -364,7 +457,19 @@ class StdFileAnalyzer(BaseAnalyzer):
         print(f"Total Time: {self.total_time}")
         print(f"Model element count average: {self.model_elements_avg}")
         print(f"Model loop count average: {self.model_loops_avg}")
-        return self.calculation_time, self.model_elements_avg, self.model_loops_avg
+        configs = {}
+        if self.out_cnf:
+            configs["out"] = self.out_cnf
+        if self.out_cnf:
+            configs["err"] = self.err_cnf
+        results = {
+            "setup_time": self.setup_time,
+            "calculation_time": self.calculation_time,
+            "total_time": self.total_time,
+            "model_element_count_average": self.model_elements_avg,
+            "model_loops_count_average": self.model_loops_avg
+        }
+        return self.job_id, configs, results
 
 
 class GProfAnalyzer(BaseAnalyzer):
@@ -393,7 +498,7 @@ class GProfAnalyzer(BaseAnalyzer):
             i = 0
             for i in range(5, len(lines)):
                 line = lines[i][:-1]
-                print(line)
+                # print(line)
                 if line != "":
                     # 19.81     10.22    10.22    62500     0.00     0.00  EnthalpyAnalysis::CreateKMatrixVolume(Element*)
                     elms = line.split(" ")
@@ -420,19 +525,19 @@ class GProfAnalyzer(BaseAnalyzer):
                 read = False
                 while "---------" not in lines[j + m]:
                     if lines[j + m].startswith("["):
-                        print("start [:")
-                        print(lines[j + m][:-1])
+                        # print("start [:")
+                        # print(lines[j + m][:-1])
                         elms = [elm.strip() for elm in lines[j + m].split(" ") if elm.strip() != ""]
                         read = True
                     elif not read:
-                        print("begginning line")
-                        print(lines[j + m][:-1])
-                        caller_lines.append(lines[j+m][:-1].strip())
+                        # print("begginning line")
+                        # print(lines[j + m][:-1])
+                        caller_lines.append(lines[j + m][:-1].strip())
                     m = m + 1
                 j = j + m
-                print(elms)
-                print(caller_lines)
-                print("---------")
+                # print(elms)
+                # print(caller_lines)
+                # print("---------")
                 if float(elms[1]) < self.threshold:
                     break
                 caller_ids = []
@@ -473,6 +578,11 @@ class GProfAnalyzer(BaseAnalyzer):
         for e in self.call_graph:
             print(e.index, e.name, e.total_time_percentage)
         print(self.profile)
+        results = {
+            "flat_profile": [fpe.as_dict() for fpe in self.flat_profile],
+            "call_graph": [cgn.as_dict() for cgn in self.call_graph]
+        }
+        return self.job_id, {"profile": self.profile}, results
 
 
 class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
@@ -495,3 +605,12 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         print(self.all_cnf)
         print(self.opt_cnf)
         print(self.miss_cnf)
+        configs = {}
+        if self.all_cnf:
+            configs["all"] = self.all_cnf
+        if self.opt_cnf:
+            configs["opt"] = self.opt_cnf
+        if self.miss_cnf:
+            configs["miss"] = self.miss_cnf
+        results = {}
+        return self.job_id, configs, results
