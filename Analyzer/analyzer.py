@@ -366,7 +366,7 @@ class ResultAnalyzer:
             for job_id in self.gprof_files.keys():
                 gprof_analyzer = GProfAnalyzer(int(job_id), **self.gprof_files[job_id])
                 job_id, configs, results = gprof_analyzer.analyze()
-                self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{configs.itmes()[0][0]}": configs.itmes()[0][1].result_file})
+                self.results["jobs"][f"{job_id}"]["analyzed"].append({f"profile": configs['profile'].result_file})
                 self.results["results"][f"{job_id}"].update(results)
         if self.cvr_files is not {}:
             for job_id in self.cvr_files.keys():
