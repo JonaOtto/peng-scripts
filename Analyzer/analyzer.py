@@ -338,7 +338,7 @@ class ResultAnalyzer:
                     all_configs.append(config)
         all_equal = True
         for i in range(len(all_configs) - 1):
-            if not self.config_equal_f:
+            if self.config_equal_f:
                 if self.config_equal_f(all_configs[i], all_configs[i + 1]):
                     all_equal = False
                     raise StaticEnvironmentException("Configs of experiment are not equal!")
