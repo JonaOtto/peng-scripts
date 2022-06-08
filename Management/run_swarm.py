@@ -42,5 +42,6 @@ class RunSwarm:
         results = analyzer.analyze()
         print(f"Starting exporting on experiment: {self.name}")
         exporter = Exporter(results, self.name)
+        exporter.prepare()
         exporter.export()
         print(f"Finished run swarm: {self.name}")

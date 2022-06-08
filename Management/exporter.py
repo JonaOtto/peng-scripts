@@ -1,8 +1,8 @@
 import json
 import os
+import subprocess
 
-from Analyzer.analyzer import ExperimentConfig
-
+from SLURM.exceptions import CommandExecutionException
 
 default_out_dir = "RESULTS"
 
@@ -17,7 +17,17 @@ class Exporter:
         """
         self.results = results
         self.experiment_name = experiment_name
-        self.out_file = f"{os.path.expanduser('~')}/{default_out_dir}/{self.experiment_name}.json"
+        self.suffix = 0
+        self.home_dir = os.path.expanduser('~')
+        self.out_file = f"{self.home_dir}/{default_out_dir}/{self.experiment_name}.json"
+
+    def prepare(self):
+        while os.path.isdir(f"{self.home_dir}/{self.experiment_name}-{self.suffix}"):
+            self.suffix = self.suffix + 1
+        res = subprocess.run(["mkdir", "-p", f"{self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}"])
+        if not res.returncode == 0:
+            raise CommandExecutionException(f"mkdir -p {self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}")
+        self.out_file = f"{self.home_dir}/{default_out_dir}/{self.experiment_name}-{self.suffix}/{self.experiment_name}.json"
 
     def export(self):
         """
