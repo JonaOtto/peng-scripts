@@ -95,12 +95,11 @@ class ExperimentConfig:
     def is_comparable(self, other):
         """
         Check if a ExperimentConfig is comparable with another. This means everything should be equal but the
-        result_file, job_id, source_path and the compiler flags.
+        result_file, job_id, source_path and the compiler flags. Also Apps and Resolution are not included in this:
+        USE WITH CARE!!
         There may be cases where it is useful to have other "equal" definitions. They must be implemented on their own.
         """
         return \
-            self.app == other.app and \
-            self.resolution == other.resolution and \
             self.compiler == other.compiler and \
             self.mpi_num_ranks == other.mpi_num_ranks and \
             self.job_time_limit == other.job_time_limit and \
@@ -125,8 +124,6 @@ class ExperimentConfig:
 
     def as_dict(self):
         return {
-            "app": self.app,
-            "resolution": self.resolution,
             "compiler": self.compiler,
             "mpi_num_ranks": self.mpi_num_ranks,
             "job_time_limit": self.job_time_limit,
@@ -135,9 +132,6 @@ class ExperimentConfig:
             "cpu_frequency_setting": self.cpu_frequency_setting,
             "gcc_version": self.gcc_version,
             "llvm_version": self.llvm_version,
-            "c_compiler_flags": self.c_compiler_flags,
-            "fortran_compiler_flags": self.fortran_compiler_flags,
-            "cxx_compiler_flags": self.cxx_compiler_flags,
             "petsc_version": self.petsc_version,
             "scorep_instrumentation": self.scorep_instrumentation,
             "scorep_flags": self.scorep_flags,
@@ -336,20 +330,16 @@ class ResultAnalyzer:
             for job_id in self.cvr_files.keys():
                 for config in self.cvr_files[job_id].values():
                     all_configs.append(config)
-        all_equal = True
         for i in range(len(all_configs) - 1):
             if self.config_equal_f:
                 if self.config_equal_f(all_configs[i], all_configs[i + 1]):
-                    all_equal = False
                     raise StaticEnvironmentException("Configs of experiment are not equal!")
             else:
-                if all_configs[i] != all_configs[i + 1]:
-                    all_equal = False
+                if not all_configs[i].is_comparable(all_configs[i + 1]):
                     raise StaticEnvironmentException("Configs of experiment are not equal!")
-        if all_equal:
-            self.results["environment"] = {}
-            self.results["environment"]["is_static"] = True
-            self.results["environment"]["static_environment"] = all_configs[0].as_dict()
+        self.results["environment"] = {}
+        self.results["environment"]["is_static"] = True
+        self.results["environment"]["static_environment"] = all_configs[0].as_dict()
         self.results["jobs"] = {}
         self.results["results"] = {}
         # TODO compare result data?
@@ -357,9 +347,16 @@ class ResultAnalyzer:
             for job_id in self.std_files.keys():
                 std_analyzer = StdFileAnalyzer(int(job_id), **self.std_files[job_id])
                 job_id, configs, results = std_analyzer.analyze()
-                self.results["jobs"][f"{job_id}"] = {"analyzed": []}
+                self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
                 for name, cnf in configs.items():
                     self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
+                    self.results["jobs"][f"{job_id}"]["settings"].update({
+                        "app": cnf.app,
+                        "resolution": cnf.resolution,
+                        "c_compiler_flags": cnf.c_compiler_flags,
+                        "cxx_compiler_flags": cnf.cxx_compiler_flags,
+                        "fortran_compiler_flags": cnf.fortran_compiler_flags,
+                    })
                 self.results["results"][f"{job_id}"] = {}
                 self.results["results"][f"{job_id}"].update(results)
         if self.gprof_files is not {}:
@@ -443,6 +440,12 @@ class StdFileAnalyzer(BaseAnalyzer):
                     minutes = rest.split(" min ")
                     minutes, rest = int(minutes[0]), minutes[1]
                     seconds = int(rest.split(" sec")[0])
+                    if len(str(hours)) == 1:
+                        hours = f"0{hours}"
+                    if len(str(minutes)) == 1:
+                        minutes = f"0{minutes}"
+                    if len(str(seconds)) == 1:
+                        seconds = f"0{seconds}"
                     self.total_time = f"{hours}:{minutes}:{seconds}"
             self.setup_time = self.setup_time
             self.model_elements_avg = model_elm_sum / model_elm_cnt
@@ -579,6 +582,7 @@ class GProfAnalyzer(BaseAnalyzer):
             print(e.index, e.name, e.total_time_percentage)
         print(self.profile)
         results = {
+            "used_min_percentage": self.threshold,
             "flat_profile": [fpe.as_dict() for fpe in self.flat_profile],
             "call_graph": [cgn.as_dict() for cgn in self.call_graph]
         }
