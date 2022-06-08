@@ -294,7 +294,11 @@ class GProfRun(BaseRun):
             os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out-*")
             os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.sum")
         else:
-            os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out")
+            try:
+                os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/gmon.out")
+            except FileNotFoundError:
+                print("GMON.OUT file cannot be deleted, it does not exist.")
+                pass
 
 
 class CompilerVectorizationReportRun(BaseRun):
