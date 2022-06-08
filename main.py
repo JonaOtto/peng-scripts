@@ -12,7 +12,7 @@ if __name__ == '__main__':
     r.add_run(GProfRun(
         app=App.ISSM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000,
-        own_build=False
+        # own_build=False
     ))
     r.do_run()
 
@@ -27,18 +27,18 @@ if __name__ == '__main__':
     r.add_run(BaseRun(
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
-        own_build=False
+        # own_build=False
     ))
     # gprof miniapps
     r.add_run(GProfRun(
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
-        own_build=False
+        # own_build=False
     ))
     r.add_run(GProfRun(
         app=App.ISSM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000,
-        own_build=False
+        # own_build=False
     ))
     # run the plain app to compare
     r.add_run(GProfRun(
