@@ -238,6 +238,9 @@ class ResultAnalyzer:
             # miss
             # all
         }
+        self.callgrind_files = {
+            # callgrind_out
+        }
 
         self.results = {}
 
@@ -311,6 +314,10 @@ class ResultAnalyzer:
                     if job_id not in self.gprof_files:
                         self.gprof_files[job_id] = {}
                     self.gprof_files[job_id]["profile"] = this_file_exp_config
+                elif tool == "VALGRIND-CALLGRIND":
+                    if job_id not in self.callgrind_files:
+                        self.callgrind_files[job_id] = {}
+                    self.callgrind_files[job_id]["callgrind_out"] = this_file_exp_config
                 elif tool == "VANILLA":
                     # TODO: What to do if vanilla? -> Baseline?
                     pass
@@ -330,6 +337,10 @@ class ResultAnalyzer:
         if self.cvr_files is not {}:
             for job_id in self.cvr_files.keys():
                 for config in self.cvr_files[job_id].values():
+                    all_configs.append(config)
+        if self.callgrind_files is not {}:
+            for job_id in self.callgrind_files.keys():
+                for config in self.callgrind_files[job_id].values():
                     all_configs.append(config)
         for i in range(len(all_configs) - 1):
             if self.config_equal_f:
@@ -372,6 +383,12 @@ class ResultAnalyzer:
                 job_id, configs, results = cvr_analyzer.analyze()
                 for name, cnf in configs.items():
                     self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
+                self.results["results"][f"{job_id}"].update(results)
+        if self.callgrind_files is not {}:
+            for job_id in self.callgrind_files.keys():
+                callgrind_analyzer = CallgrindAnalyzer(int(job_id), **self.callgrind_files)
+                job_id, configs, results = callgrind_analyzer.analyze()
+                self.results["jobs"][f"{job_id}"]["analyzed"].append({f"callgrind_out": configs['callgrind_out'].result_file})
                 self.results["results"][f"{job_id}"].update(results)
         print(self.results)
         return self.results
@@ -658,4 +675,22 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         if self.miss_cnf:
             configs["miss"] = self.miss_cnf
         results = {}
+        return self.job_id, configs, results
+
+
+class CallgrindAnalyzer(BaseAnalyzer):
+
+    def __init__(self, job_id: int, callgrind_out: ExperimentConfig = None):
+        super().__init__(job_id)
+        self.callgrind_out = callgrind_out
+
+    def analyze(self):
+        print("\n\nANALYZING CVR!!")
+        print(self.callgrind_out)
+        configs = {
+            "callgrind_out": self.callgrind_out,
+        }
+        results = {
+
+        }
         return self.job_id, configs, results

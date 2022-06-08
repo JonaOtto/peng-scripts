@@ -346,6 +346,7 @@ class CallgrindRun(BaseRun):
         """
         Constructor.
         """
+        self.add_tool("VALGRIND-CALLGRIND")
         builder = CallgrindBuilder(app, source_path[app])
         super().__init__(app, resolution, builder=builder, vanilla=False, *args, **kwargs)
         self.prepend_run_command(f"valgrind --tool=callgrind {'--cache-sim=yes' if cache_sim else ''} {'--brach-sim=yes' if branch_sim else ''}")
