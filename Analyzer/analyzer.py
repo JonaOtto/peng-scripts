@@ -177,6 +177,7 @@ class _FlatProfileEntry:
             "number_of_calls_to_this": self.calls_to_this,
             "cumulated_milliseconds_per_call": self.cumulated_ms_calls,
             "individual_milliseconds_per_call": self.self_ms_calls,
+            "name": self.name,
         }
 
 
