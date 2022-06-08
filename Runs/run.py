@@ -25,9 +25,9 @@ model_setup_path = {
     Resolution.G64000: "greenland-setup/G64000"
 }
 is_active = {
-    "build": True,
-    "load_modules": True,  # False
-    "run": True,  # False
+    "build": True,  # works: True
+    "load_modules": False,  # works: False
+    "run": False,  # works: False
 }  # analyze and cleanup are after this: there are "active" by default.
 
 # mpirun -n 96 $ISSM_DIR/bin/issm.exe TransientSolution $PWD PAtransient_std_$FOLDER
