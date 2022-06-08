@@ -3,7 +3,8 @@ import subprocess
 from typing import Tuple
 
 import SLURM.slurm
-from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder, CompilerVectorizationReportBuilder
+from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder, CompilerVectorizationReportBuilder, \
+    CallgrindBuilder
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
 # source and executable paths by app:
@@ -335,4 +336,25 @@ class CompilerVectorizationReportRun(BaseRun):
                                                      gcc_flags=gcc_flags
                                                      )
         self.builder = builder
+
+
+class CallgrindRun(BaseRun):
+    """
+    Valgrind callgrind run.
+    """
+    def __init__(self, app: App, resolution: Resolution, cache_sim: bool = False, branch_sim: bool = False, *args, **kwargs):
+        """
+        Constructor.
+        """
+        builder = CallgrindBuilder(app, source_path[app])
+        super().__init__(app, resolution, builder=builder, vanilla=False, *args, **kwargs)
+        self.prepend_run_command(f"valgrind --tool=callgrind {'--cache-sim=yes' if cache_sim else ''} {'--brach-sim=yes' if branch_sim else ''}")
+        self.add_command("callgrind_control -b")
+        self.add_command("callgrind_annotate callgrind.out.*")
+
+    def cleanup(self, job_id: int, remove_build: bool = False):
+        super().cleanup(job_id, remove_build)
+        # TODO: How the out file is named?
+        # TODO: Move output file(s)? to the out dir.
+        # os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/callgrind.out.*")
 
