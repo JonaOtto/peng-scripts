@@ -358,7 +358,10 @@ class ResultAnalyzer:
                     raise StaticEnvironmentException("Configs of experiment are not equal!")
         self.results["environment"] = {}
         self.results["environment"]["is_static"] = True
-        self.results["environment"]["static_environment"] = all_configs[0].as_dict()
+        try:
+            self.results["environment"]["static_environment"] = all_configs[0].as_dict()
+        except IndexError:
+            self.results["environment"]["static_environment"] = None
         self.results["jobs"] = {}
         self.results["results"] = {}
         # TODO compare result data?
