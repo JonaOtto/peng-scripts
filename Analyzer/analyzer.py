@@ -396,7 +396,7 @@ class ResultAnalyzer:
                 self.results["results"][f"{job_id}"].update(results)
         if self.callgrind_files is not {}:
             for job_id in self.callgrind_files.keys():
-                callgrind_analyzer = CallgrindAnalyzer(int(job_id), **self.callgrind_files)
+                callgrind_analyzer = CallgrindAnalyzer(int(job_id), **self.callgrind_files[job_id])
                 job_id, configs, results = callgrind_analyzer.analyze()
                 if type(self.results["jobs"][f"{job_id}"]) != dict:
                     self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
