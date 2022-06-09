@@ -369,6 +369,19 @@ class CallgrindRun(BaseRun):
 
     def cleanup(self, job_id: int, remove_build: bool = False):
         super().cleanup(job_id, remove_build)
-        # TODO: How the out file is named?
-        # TODO: Move output file(s)? to the out dir.
-        # os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/callgrind.out.*")
+        # find the correct out file (assuming only one version of them is there)
+        callgrind_file = None
+        core_file = None
+        for file in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
+            if "callgrind.out." in file:
+                callgrind_file = file
+            elif "vgcore." in file:
+                core_file = file
+        print(callgrind_file)
+        print(core_file)
+        # backup files to out dir
+        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}", f"{self.out_path}/{callgrind_file}"])
+        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}", f"{self.out_path}/{core_file}"])
+        # remove out files
+        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}")
+        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
