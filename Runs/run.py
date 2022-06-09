@@ -129,19 +129,25 @@ class BaseRun:
         """
         self.execution_command.extend(commands)
 
+    def setup_slurm_config(self):
+        """
+        Sets up the slurm config. Has to be called bevor accessing the slurm config.
+        """
+        if not self.slurm_configuration:
+            self.slurm_configuration = DefaultPEngSlurmConfig(
+                job_name=self.jobname_skeleton,
+                output_directory=default_out_dir,
+                job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
+                num_mpi_ranks=self.num_mpi_ranks
+            )
+
     def prepare(self):
         """
         Builds the ISSM build.
         """
-        self.slurm_configuration = DefaultPEngSlurmConfig(
-            job_name=self.jobname_skeleton,
-            output_directory=default_out_dir,
-            job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
-            num_mpi_ranks=self.num_mpi_ranks
-        )
+        self.setup_slurm_config()
         # make out dir, just in case something else puts stuff there
         self.slurm_configuration.make_dirs()
-
         if self.own_build:
             if is_active["build"]:
                 self.builder.prepare_build()
@@ -357,6 +363,7 @@ class CallgrindRun(BaseRun):
         self.add_command("callgrind_control -b")
         self.add_command("callgrind_annotate callgrind.out.*")
         # add valgrind module
+        self.setup_slurm_config()  # setup slurm config upfront of prepare()
         self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=True)
         self.slurm_configuration.add_module(name="valgrind", version="3.16.1")
 
