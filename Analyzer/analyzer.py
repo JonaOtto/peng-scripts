@@ -321,7 +321,10 @@ class ResultAnalyzer:
                 elif tool == "VALGRIND-CALLGRIND":
                     if job_id not in self.callgrind_files:
                         self.callgrind_files[job_id] = {}
-                    self.callgrind_files[job_id]["callgrind_out"] = this_file_exp_config
+                    if extension == "callgrind-out":
+                        self.callgrind_files[job_id]["callgrind_out"] = this_file_exp_config
+                    elif extension == "callgrind-vgcore":
+                        self.callgrind_files[job_id]["callgrind_vgcore"] = this_file_exp_config
                 elif tool == "VANILLA":
                     # TODO: What to do if vanilla? -> Baseline?
                     pass
@@ -687,10 +690,13 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
 
 
 class CallgrindAnalyzer(BaseAnalyzer):
-
-    def __init__(self, job_id: int, callgrind_out: ExperimentConfig = None):
+    """
+    Callgrind Analyzer.
+    """
+    def __init__(self, job_id: int, callgrind_out: ExperimentConfig = None, callgrind_vgcore: ExperimentConfig = None):
         super().__init__(job_id)
         self.callgrind_out = callgrind_out
+        self.callgrind_vgcore = callgrind_vgcore
 
     def analyze(self):
         print("\n\nANALYZING CVR!!")
@@ -699,6 +705,8 @@ class CallgrindAnalyzer(BaseAnalyzer):
             "callgrind_out": self.callgrind_out,
         }
         results = {
-
+            "callgrind_out": self.callgrind_out.result_file,
+            "callgrind_vgcore": self.callgrind_vgcore.result_file,
+            "examine_with_cmd": f"kcachegrind {self.callgrind_out.result_file}"
         }
         return self.job_id, configs, results

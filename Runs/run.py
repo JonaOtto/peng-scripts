@@ -380,8 +380,10 @@ class CallgrindRun(BaseRun):
         print(callgrind_file)
         print(core_file)
         # backup files to out dir
-        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}", f"{self.out_path}/{callgrind_file}"])
-        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}", f"{self.out_path}/{core_file}"])
+        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}",
+                        f"{self.out_path}/{self.jobname_skeleton}.callgrind-out"])
+        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}",
+                        f"{self.out_path}/{self.jobname_skeleton}.callgrind-vgcore"])
         # remove out files
-        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}")
-        os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
+        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}")
+        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")

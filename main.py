@@ -51,6 +51,7 @@ if __name__ == '__main__':
     r.add_run(CallgrindRun(
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G64000,
+        own_build=False,
     ))
     r.do_run()
 
