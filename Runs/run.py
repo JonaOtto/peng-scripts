@@ -364,7 +364,7 @@ class CallgrindRun(BaseRun):
         self.add_command("callgrind_annotate callgrind.out.*")
         # add valgrind module
         self.setup_slurm_config()  # setup slurm config upfront of prepare()
-        self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=True)
+        self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=False)
         self.slurm_configuration.add_module(name="valgrind", version="3.16.1")
 
     def cleanup(self, job_id: int, remove_build: bool = False):
