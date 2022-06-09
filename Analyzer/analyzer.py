@@ -402,6 +402,14 @@ class ResultAnalyzer:
                     self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
                 if type(self.results["results"][f"{job_id}"]) != dict:
                     self.results["results"][f"{job_id}"] = {}
+                if self.results["jobs"][f"{job_id}"]["settings"] == {}:
+                    self.results["jobs"][f"{job_id}"]["settings"].update({
+                        "app": configs["callgrind_out"].app,
+                        "resolution": configs["callgrind_out"].resolution,
+                        "c_compiler_flags": configs["callgrind_out"].c_compiler_flags,
+                        "cxx_compiler_flags": configs["callgrind_out"].cxx_compiler_flags,
+                        "fortran_compiler_flags": configs["callgrind_out"].fortran_compiler_flags,
+                    })
                 self.results["jobs"][f"{job_id}"]["analyzed"].append({f"callgrind_out": configs['callgrind_out'].result_file})
                 self.results["results"][f"{job_id}"].update(results)
         print(self.results)
