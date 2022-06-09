@@ -182,7 +182,7 @@ class BaseRun:
 
         res = subprocess.run(["bash", "-c", self.execution_command],
                              executable="/bin/bash",
-                             #shell=True,
+                             # shell=True,
                              env=os.environ.copy(),
                              stdout=subprocess.PIPE)
         if res.returncode != 0:
@@ -213,9 +213,9 @@ class BaseRun:
         slurm_path = self.slurm_configuration.get_slurm_file_path()
         subprocess.run(["cp", f"{slurm_path}.sh", f"{self.out_path}/{self.jobname_skeleton}.job.{job_id}"])
         # Clean up job file (leave model dirs clean)
-        os.remove(self.slurm_configuration.get_slurm_file_path()+".sh")
+        os.remove(self.slurm_configuration.get_slurm_file_path() + ".sh")
         if remove_build:
-            folder = self.home_dir+"/"+"/".join(executable_path[self.app].split("/")[:-1])
+            folder = self.home_dir + "/" + "/".join(executable_path[self.app].split("/")[:-1])
             os.remove(f"{self.home_dir}/{executable_path[self.app]}")  # the executable
             os.remove(f"{self.home_dir}/{folder}/issm-load.sh")  # issm-load.sh
             os.remove(f"{self.home_dir}/{folder}/issmModule.lua")  # issmMoudle.lua
@@ -249,7 +249,8 @@ class GProfRun(BaseRun):
     A run with the tool GProf.
     """
 
-    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None, parallel_sum: bool = False, *args, **kwargs):
+    def __init__(self, app: App, resolution: Resolution, gprof_out_filename: str = None, parallel_sum: bool = False,
+                 *args, **kwargs):
         """
         Constructor.
         :param app: The app to use.
@@ -342,20 +343,25 @@ class CallgrindRun(BaseRun):
     """
     Valgrind callgrind run.
     """
-    def __init__(self, app: App, resolution: Resolution, cache_sim: bool = False, branch_sim: bool = False, *args, **kwargs):
+
+    def __init__(self, app: App, resolution: Resolution, cache_sim: bool = False, branch_sim: bool = False, *args,
+                 **kwargs):
         """
         Constructor.
         """
         self.add_tool("VALGRIND-CALLGRIND")
         builder = CallgrindBuilder(app, source_path[app])
         super().__init__(app, resolution, builder=builder, vanilla=False, *args, **kwargs)
-        self.prepend_run_command(f"valgrind --tool=callgrind {'--cache-sim=yes' if cache_sim else ''} {'--brach-sim=yes' if branch_sim else ''}")
+        self.prepend_run_command(
+            f"valgrind --tool=callgrind {'--cache-sim=yes' if cache_sim else ''} {'--brach-sim=yes' if branch_sim else ''}")
         self.add_command("callgrind_control -b")
         self.add_command("callgrind_annotate callgrind.out.*")
+        # add valgrind module
+        self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=True)
+        self.slurm_configuration.add_module(name="valgrind", version="3.16.1")
 
     def cleanup(self, job_id: int, remove_build: bool = False):
         super().cleanup(job_id, remove_build)
         # TODO: How the out file is named?
         # TODO: Move output file(s)? to the out dir.
         # os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/callgrind.out.*")
-
