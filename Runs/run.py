@@ -360,8 +360,8 @@ class CallgrindRun(BaseRun):
         self.add_tool("VALGRIND-CALLGRIND")
         self.prepend_run_command(
             f"valgrind --tool=callgrind {'--cache-sim=yes' if cache_sim else ''} {'--brach-sim=yes' if branch_sim else ''}")
-        self.add_command("callgrind_control -b")
-        self.add_command("callgrind_annotate callgrind.out.*")
+        self.add_command("callgrind_control -b", bevor=False)
+        self.add_command("callgrind_annotate callgrind.out.*", bevor=False)
         # add valgrind module
         self.setup_slurm_config()  # setup slurm config upfront of prepare()
         self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=False)
