@@ -44,4 +44,5 @@ class Experiment:
         exporter = Exporter(results, self.name)
         exporter.prepare()
         exporter.export()
+        #exporter.commit_and_push()
         print(f"Finished run swarm: {self.name}")
