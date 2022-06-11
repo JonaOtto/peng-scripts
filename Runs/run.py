@@ -222,11 +222,10 @@ class BaseRun:
         # Clean up job file (leave model dirs clean)
         os.remove(self.slurm_configuration.get_slurm_file_path() + ".sh")
         if remove_build:
-            folder = self.home_dir + "/" + "/".join(executable_path[self.app].split("/")[:-1])
             os.remove(f"{self.home_dir}/{executable_path[self.app]}")  # the executable
-            os.remove(f"{folder}/issm-load.sh")  # issm-load.sh
-            os.remove(f"{folder}/issmModule.lua")  # issmMoudle.lua
-            subprocess.run(["bash", "-c", f"rm -r {folder}"])
+            os.remove(f"{self.home_dir}/{executable_path[self.app]}/issm-load.sh")  # issm-load.sh
+            os.remove(f"{self.home_dir}/{executable_path[self.app]}/issmModule.lua")  # issmMoudle.lua
+            subprocess.run(["bash", "-c", f"rm -r {self.home_dir}/{executable_path[self.app]}/bin"])
         if not is_active["build"]:
             self.builder.cleanup_build()
         # move results into specific folder with job_id
@@ -389,3 +388,13 @@ class CallgrindRun(BaseRun):
         # remove out files
         #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}")
         #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
+
+
+class MPIRun(BaseRun):
+    """
+    MPI compare run.
+    """
+    def __init__(self, app: App, resolution: Resolution, *args, **kwargs):
+        super().__init__(app, resolution, *args, **kwargs)
+        self.builder = BaseBuilder(app, source_path[app])
+        self.add_tool("MPI-COMPARE")
