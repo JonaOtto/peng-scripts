@@ -328,6 +328,7 @@ class ResultAnalyzer:
                         print(this_file_exp_config.result_file)
                         self.std_files[job_id]["out"] = this_file_exp_config
                         # add file to mpi compare for later mpi compare
+                        # todo split for the apps
                         if tool == "MPI-COMPARE":
                             self.mpi_compare.update({this_file_exp_config.mpi_num_ranks: None})
                     elif extension == "err":

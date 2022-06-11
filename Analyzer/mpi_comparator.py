@@ -6,7 +6,11 @@ class MPIComparator:
         self.analyzer_results = analyzer_results
         self.results = {}
 
-    def
+    def calc_speedups(self):
+        pass
+
+    def export_graph(self):
+        pass
 
     def analyze(self):
         print("MPI Compare!!")
