@@ -54,7 +54,7 @@ class BaseRun:
                  own_build: bool = True,
                  runner: str = default_runner,
                  run_command: str = default_run_command,
-                 cleanup_build: bool = False,
+                 cleanup_build: bool = True,
                  vanilla: bool = True):
         self.app = app
         self.resolution = resolution
@@ -88,6 +88,8 @@ class BaseRun:
         # if not tool is used add "VANILLA"
         if vanilla:
             self.add_tool("VANILLA")
+        # prepend time command for wall clock real time
+        self.prepend_run_command("/usr/bin/time -f %e")
 
     def add_tool(self, name: str):
         """
