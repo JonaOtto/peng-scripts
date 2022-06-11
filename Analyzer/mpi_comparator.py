@@ -1,4 +1,4 @@
-import matplotlib as mpl
+#import matplotlib as mpl
 
 
 class MPIComparator:

@@ -33,7 +33,7 @@ Usage: valgrind –tool=[tools] [opts] program [args]
 ### Intel vTune ###
 Commercial tool: Like valgrind but fancy. Advanced Hotspot analysis, capable of MPI, OpenMP, ...
 Load with module load intel, run: vtune-gui (ssh X-Forwarding!)
-Usage: Use the gui to start your application. See analyzer_results right there.
+Usage: Use the gui to start your application. See results right there.
 
 ### Score-P ###
 
@@ -63,7 +63,7 @@ Usage: ?
 The open version of vTune. 
 Usage: Download, compile and install via Spack PM. "hpcrun ./PROGRAM [args]"
 Sampling events are based on regular interrupts of the program: e.g. –e PAPI_TOT_CYC@1000000.
-After execution build measurement db with "hpcstruct PROGRAM". Use "hpcviewer" to view the analyzer_results.
+After execution build measurement db with "hpcstruct PROGRAM". Use "hpcviewer" to view the results.
 
 """
 """
