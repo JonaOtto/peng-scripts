@@ -425,7 +425,7 @@ class ResultAnalyzer:
                 if type(self.results["results"][f"{job_id}"]) != dict:
                     self.results["results"][f"{job_id}"] = {}
                 if self.results["jobs"][f"{job_id}"]["settings"] == {}:
-                    self.results["jobs"][f"{job_id}"]["settings"].update(cnf.as_dict(env=False))
+                    self.results["jobs"][f"{job_id}"]["settings"].update(configs["callgrind_out"].as_dict(env=False))
                 self.results["jobs"][f"{job_id}"]["analyzed"].append({f"callgrind_out": configs['callgrind_out'].result_file})
                 self.results["results"][f"{job_id}"].update(results)
         print(self.results)
