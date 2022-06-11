@@ -225,7 +225,7 @@ class BaseRun:
             os.remove(f"{self.home_dir}/{executable_path[self.app]}")  # the executable
             os.remove(f"{self.home_dir}/{source_path[self.app]}/issm-load.sh")  # issm-load.sh
             os.remove(f"{self.home_dir}/{source_path[self.app]}/issmModule.lua")  # issmMoudle.lua
-            subprocess.run(["bash", "-c", f"rm -r {self.home_dir}/{executable_path[self.app]}/bin"])
+            subprocess.run(["bash", "-c", f"rm -r {self.home_dir}/{source_path[self.app]}/bin"])
         if not is_active["build"]:
             self.builder.cleanup_build()
         # move results into specific folder with job_id

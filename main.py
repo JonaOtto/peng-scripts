@@ -7,12 +7,13 @@ if __name__ == '__main__':
     # gprof miniapps
     r.add_run(GProfRun(
         app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000
+        resolution=Resolution.G16000,
+        cleanup_build=True
     ))
     r.add_run(GProfRun(
         app=App.ISSM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000,
-        own_build=False,
+        # own_build=False,
         cleanup_build=True
     ))
     r.do_run()
