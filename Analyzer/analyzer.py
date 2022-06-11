@@ -319,13 +319,13 @@ class ResultAnalyzer:
                     if job_id not in self.std_files:
                         self.std_files[job_id] = {}
                     if extension == "out":
-                        # if "VALGRIND" in tool:  # valgrind has different out files
-                        #     continue
+                        if "VALGRIND" in tool:  # valgrind has different out files
+                            continue
                         print(this_file_exp_config.result_file)
                         self.std_files[job_id]["out"] = this_file_exp_config
                     elif extension == "err":
-                        # if "VALGRIND" in tool:  # valgrind has different out files
-                        #     continue
+                        if "VALGRIND" in tool:  # valgrind has different out files
+                            continue
                         self.std_files[job_id]["err"] = this_file_exp_config
                     elif extension == "job":
                         # This is the jobfile. Not of interest here
@@ -420,12 +420,12 @@ class ResultAnalyzer:
             for job_id in self.callgrind_files.keys():
                 callgrind_analyzer = CallgrindAnalyzer(int(job_id), **self.callgrind_files[job_id])
                 job_id, configs, results = callgrind_analyzer.analyze()
-                # if type(self.results["jobs"][f"{job_id}"]) != dict:
-                #     self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
-                # if type(self.results["results"][f"{job_id}"]) != dict:
-                #     self.results["results"][f"{job_id}"] = {}
-                # if self.results["jobs"][f"{job_id}"]["settings"] == {}:
-                #     self.results["jobs"][f"{job_id}"]["settings"].update(cnf.as_dict(env=False))
+                if type(self.results["jobs"][f"{job_id}"]) != dict:
+                    self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
+                if type(self.results["results"][f"{job_id}"]) != dict:
+                    self.results["results"][f"{job_id}"] = {}
+                if self.results["jobs"][f"{job_id}"]["settings"] == {}:
+                    self.results["jobs"][f"{job_id}"]["settings"].update(cnf.as_dict(env=False))
                 self.results["jobs"][f"{job_id}"]["analyzed"].append({f"callgrind_out": configs['callgrind_out'].result_file})
                 self.results["results"][f"{job_id}"].update(results)
         print(self.results)
