@@ -4,6 +4,7 @@ from typing import List, Union, Tuple, Callable
 
 from Builder.builder import App, Resolution, Compiler
 from Analyzer.exceptions import *
+from Analyzer.mpi_comparator import MPIComparator
 
 default_out_dir = "/home/kurse/kurs00054/jo83xafu/issm-output/OUT"
 lichtenberg_defaults = {
@@ -268,6 +269,9 @@ class ResultAnalyzer:
         self.callgrind_files = {
             # callgrind_out
         }
+        self.mpi_compare = {
+            # dict of MPI-NUM: results of std-out
+        }
 
         self.results = {}
 
@@ -323,6 +327,9 @@ class ResultAnalyzer:
                             continue
                         print(this_file_exp_config.result_file)
                         self.std_files[job_id]["out"] = this_file_exp_config
+                        # add file to mpi compare for later mpi compare
+                        if tool == "MPI-COMPARE":
+                            self.mpi_compare.update({this_file_exp_config.mpi_num_ranks: None})
                     elif extension == "err":
                         if "VALGRIND" in tool:  # valgrind has different out files
                             continue
@@ -401,8 +408,15 @@ class ResultAnalyzer:
                 for name, cnf in configs.items():
                     self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
                     self.results["jobs"][f"{job_id}"]["settings"].update(cnf.as_dict(env=False))
+                    # update results to mpi compare
+                    if cnf.mpi_num_ranks in self.mpi_compare:
+                        self.mpi_compare[cnf.mpi_num_ranks] = results
                 self.results["results"][f"{job_id}"] = {}
                 self.results["results"][f"{job_id}"].update(results)
+            # run mpi comparator
+            if self.mpi_compare != {}:
+                comparator = MPIComparator(self.mpi_compare)
+                comparator.analyze()
         if self.gprof_files is not {}:
             for job_id in self.gprof_files.keys():
                 gprof_analyzer = GProfAnalyzer(int(job_id), **self.gprof_files[job_id])

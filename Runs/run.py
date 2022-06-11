@@ -223,8 +223,8 @@ class BaseRun:
         os.remove(self.slurm_configuration.get_slurm_file_path() + ".sh")
         if remove_build:
             os.remove(f"{self.home_dir}/{executable_path[self.app]}")  # the executable
-            os.remove(f"{self.home_dir}/{executable_path[self.app]}/issm-load.sh")  # issm-load.sh
-            os.remove(f"{self.home_dir}/{executable_path[self.app]}/issmModule.lua")  # issmMoudle.lua
+            os.remove(f"{self.home_dir}/{source_path[self.app]}/issm-load.sh")  # issm-load.sh
+            os.remove(f"{self.home_dir}/{source_path[self.app]}/issmModule.lua")  # issmMoudle.lua
             subprocess.run(["bash", "-c", f"rm -r {self.home_dir}/{executable_path[self.app]}/bin"])
         if not is_active["build"]:
             self.builder.cleanup_build()
