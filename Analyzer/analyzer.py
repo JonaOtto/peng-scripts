@@ -5,8 +5,10 @@ from typing import List, Union, Tuple, Callable
 from Builder.builder import App, Resolution, Compiler
 from Analyzer.exceptions import *
 
-default_out_dir = "/home/kurse/kurs00054/jo83xafu/OUT"
+default_out_dir = "/home/kurse/kurs00054/jo83xafu/issm-output/OUT"
 lichtenberg_defaults = {
+    "os": "RedHat",
+    "os_version": "8.5",
     "cpu": "Intel AVX-512",
     "cpu_cores": 48,
     "cpu_count": 2,
@@ -49,6 +51,8 @@ class ExperimentConfig:
                  resolution: Resolution = None,
                  compiler: Compiler = None,
                  mpi_num_ranks: int = None,
+                 os: str = lichtenberg_defaults["os"],
+                 os_version: str = lichtenberg_defaults["os_version"],
                  cpu: str = lichtenberg_defaults["cpu"],
                  cpu_cores: int = lichtenberg_defaults["cpu_cores"],
                  cpu_count: int = lichtenberg_defaults["cpu_count"],
@@ -81,6 +85,8 @@ class ExperimentConfig:
         self.petsc_version = petsc_version
         self.scorep_instrumentation = scorep_instrumentation
         self.scorep_flags = scorep_flags
+        self.os = os
+        self.os_version = os_version
         self.cpu = cpu
         self.cpu_cores = cpu_cores
         self.cpu_count = cpu_count
@@ -111,6 +117,8 @@ class ExperimentConfig:
             self.petsc_version == other.petsc_version and \
             self.scorep_instrumentation == other.scorep_instrumentation and \
             self.scorep_flags == other.scorep_flags and \
+            self.os == other.os and \
+            self.os_version == other.os_version and \
             self.cpu == other.cpu and \
             self.cpu_cores == other.cpu_cores and \
             self.cpu_count == other.cpu_count and \
@@ -122,8 +130,11 @@ class ExperimentConfig:
             self.network == other.network and \
             self.network_speed == other.network_speed
 
-    def as_dict(self):
-        return {
+    def as_dict(self, env=True):
+        """
+        env: Output stuff about environment, not job-specific stuff.
+        """
+        res = {
             "compiler": self.compiler,
             "mpi_num_ranks": self.mpi_num_ranks,
             "job_time_limit": self.job_time_limit,
@@ -135,6 +146,8 @@ class ExperimentConfig:
             "petsc_version": self.petsc_version,
             "scorep_instrumentation": self.scorep_instrumentation,
             "scorep_flags": self.scorep_flags,
+            "os": self.os,
+            "os_version": self.os_version,
             "cpu": self.cpu,
             "cpu_cores": self.cpu_cores,
             "cpu_count": self.cpu_count,
@@ -146,6 +159,20 @@ class ExperimentConfig:
             "network": self.network,
             "network_speed": self.network_speed
         }
+        if env:
+            return res
+        else:
+            res.update({
+                "result_file": self.result_file,
+                "job_id": self.job_id,
+                "source_path": self.source_path,
+                "app": self.app,
+                "model": self.resolution,
+                "c_compiler_flags": self.c_compiler_flags,
+                "fortran_compiler_flags": self.fortran_compiler_flags,
+                "cxx_compiler_flags": self.cxx_compiler_flags,
+            })
+            return res
 
     def __eq__(self, other):
         """
@@ -292,13 +319,13 @@ class ResultAnalyzer:
                     if job_id not in self.std_files:
                         self.std_files[job_id] = {}
                     if extension == "out":
-                        if "VALGRIND" in tool:  # valgrind has different out files
-                            continue
+                        # if "VALGRIND" in tool:  # valgrind has different out files
+                        #     continue
                         print(this_file_exp_config.result_file)
                         self.std_files[job_id]["out"] = this_file_exp_config
                     elif extension == "err":
-                        if "VALGRIND" in tool:  # valgrind has different out files
-                            continue
+                        # if "VALGRIND" in tool:  # valgrind has different out files
+                        #     continue
                         self.std_files[job_id]["err"] = this_file_exp_config
                     elif extension == "job":
                         # This is the jobfile. Not of interest here
@@ -333,6 +360,7 @@ class ResultAnalyzer:
                 del this_file_exp_config
         # start the specific analyzers
         all_configs = []
+        all_equal = True
         if self.std_files is not {}:
             for job_id in self.std_files.keys():
                 for config in self.std_files[job_id].values():
@@ -351,13 +379,13 @@ class ResultAnalyzer:
                     all_configs.append(config)
         for i in range(len(all_configs) - 1):
             if self.config_equal_f:
-                if self.config_equal_f(all_configs[i], all_configs[i + 1]):
-                    raise StaticEnvironmentException("Configs of experiment are not equal!")
+                if not self.config_equal_f(all_configs[i], all_configs[i + 1]):
+                    all_equal = False
             else:
                 if not all_configs[i].is_comparable(all_configs[i + 1]):
-                    raise StaticEnvironmentException("Configs of experiment are not equal!")
+                    all_equal = False
         self.results["environment"] = {}
-        self.results["environment"]["is_static"] = True
+        self.results["environment"]["is_static"] = all_equal
         try:
             self.results["environment"]["static_environment"] = all_configs[0].as_dict()
         except IndexError:
@@ -372,13 +400,7 @@ class ResultAnalyzer:
                 self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
                 for name, cnf in configs.items():
                     self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
-                    self.results["jobs"][f"{job_id}"]["settings"].update({
-                        "app": cnf.app,
-                        "resolution": cnf.resolution,
-                        "c_compiler_flags": cnf.c_compiler_flags,
-                        "cxx_compiler_flags": cnf.cxx_compiler_flags,
-                        "fortran_compiler_flags": cnf.fortran_compiler_flags,
-                    })
+                    self.results["jobs"][f"{job_id}"]["settings"].update(cnf.as_dict(env=False))
                 self.results["results"][f"{job_id}"] = {}
                 self.results["results"][f"{job_id}"].update(results)
         if self.gprof_files is not {}:
@@ -398,18 +420,12 @@ class ResultAnalyzer:
             for job_id in self.callgrind_files.keys():
                 callgrind_analyzer = CallgrindAnalyzer(int(job_id), **self.callgrind_files[job_id])
                 job_id, configs, results = callgrind_analyzer.analyze()
-                if type(self.results["jobs"][f"{job_id}"]) != dict:
-                    self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
-                if type(self.results["results"][f"{job_id}"]) != dict:
-                    self.results["results"][f"{job_id}"] = {}
-                if self.results["jobs"][f"{job_id}"]["settings"] == {}:
-                    self.results["jobs"][f"{job_id}"]["settings"].update({
-                        "app": configs["callgrind_out"].app,
-                        "resolution": configs["callgrind_out"].resolution,
-                        "c_compiler_flags": configs["callgrind_out"].c_compiler_flags,
-                        "cxx_compiler_flags": configs["callgrind_out"].cxx_compiler_flags,
-                        "fortran_compiler_flags": configs["callgrind_out"].fortran_compiler_flags,
-                    })
+                # if type(self.results["jobs"][f"{job_id}"]) != dict:
+                #     self.results["jobs"][f"{job_id}"] = {"analyzed": [], "settings": {}}
+                # if type(self.results["results"][f"{job_id}"]) != dict:
+                #     self.results["results"][f"{job_id}"] = {}
+                # if self.results["jobs"][f"{job_id}"]["settings"] == {}:
+                #     self.results["jobs"][f"{job_id}"]["settings"].update(cnf.as_dict(env=False))
                 self.results["jobs"][f"{job_id}"]["analyzed"].append({f"callgrind_out": configs['callgrind_out'].result_file})
                 self.results["results"][f"{job_id}"].update(results)
         print(self.results)

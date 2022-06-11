@@ -13,7 +13,8 @@ from SLURM.exceptions import CommandExecutionException
 source_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp",
     App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp",
-    App.ISSM_4_18: "issm-4.18"
+    App.ISSM_4_18: "issm-4.18",
+    App.ISSM_CUSTOM: "issm-custom"
 }
 executable_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp/bin/miniappthermal.exe",
@@ -35,7 +36,7 @@ is_active = {
 default_runner = "mpirun"
 default_executable = "$ISSM_DIR/bin/issm.exe"
 default_run_command = "TransientSolution $PWD PAtransient_std_$FOLDER"
-default_out_dir = "/home/kurse/kurs00054/jo83xafu/OUT"
+default_out_dir = "/home/kurse/kurs00054/jo83xafu/issm-output/OUT"
 
 
 class BaseRun:
@@ -360,7 +361,7 @@ class CallgrindRun(BaseRun):
         self.add_tool("VALGRIND-CALLGRIND")
         self.prepend_run_command(
             f"valgrind --tool=callgrind {'--cache-sim=yes' if cache_sim else ''} {'--brach-sim=yes' if branch_sim else ''}")
-        self.add_command("callgrind_control -b", bevor=False)
+        # self.add_command("callgrind_control -b", bevor=False)
         self.add_command("callgrind_annotate callgrind.out.*", bevor=False)
         # add valgrind module
         self.setup_slurm_config()  # setup slurm config upfront of prepare()

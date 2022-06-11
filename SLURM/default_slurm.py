@@ -6,7 +6,7 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
 
     def __init__(self,
                  job_name: str,
-                 output_directory: str = "/home/kurse/kurs00054/jo83xafu/OUT",
+                 output_directory: str = "/home/kurse/kurs00054/jo83xafu/issm-output/OUT",
                  job_file_directory: str = "/home/kurse/kurs00054/jo83xafu",
                  num_mpi_ranks: int = 96):
         """
@@ -14,9 +14,9 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
         :param job_name: The jobs name. Use the job name wisely: Give info about the run, everything will be constructed upon this.
         Think about later processing!
         :param output_directory: The directory the std out- and err files goes in. Give without trailing slash.
-        Defaults to /home/kurse/kurs00054/jo83xafu/OUT. The job name will be added as an sub-directory.
+        Defaults to /home/kurse/kurs00054/jo83xafu/output-dir/OUT. The job name will be added as an sub-directory.
         :param job_file_directory: The directory the job file goes in. Give without trailing slash.
-        Defaults to: /home/kurse/kurs00054/jo83xafu/jobfiles.
+        Defaults to: /home/kurse/kurs00054/jo83xafu/jobfiles. NOT USED ANYMORE!
         :param num_mpi_ranks: The number of mpi ranks
         """
         # Manage file names:

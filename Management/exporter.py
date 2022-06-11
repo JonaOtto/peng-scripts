@@ -4,7 +4,8 @@ import subprocess
 
 from SLURM.exceptions import CommandExecutionException
 
-default_out_dir = "RESULTS"
+default_out_dir = "issm-output/RESULTS"
+git_dir = "issm-output"
 
 
 class Exporter:
@@ -37,3 +38,15 @@ class Exporter:
         """
         with open(self.out_file, "w") as f:
             f.write(json.dumps(self.results, indent=4))
+
+    def commit_and_push(self):
+        """
+        commits and pushes the results in the issm-output git.
+        """
+        print(f"Committing: Updated results for experiment {self.experiment_name}")
+        os.chdir(f"{self.home_dir}/{git_dir}")
+        subprocess.run(["git" "add", "-A"])
+        subprocess.run(["git" "commit", "-m", f"Updated results for experiment {self.experiment_name}"])
+        print("Pushing")
+        subprocess.run(["git", "push"])
+        print("Finished! Updated the output git.")

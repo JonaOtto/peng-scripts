@@ -8,12 +8,13 @@ class App:
     """
     Enum for App to run.
     """
+    ISSM_CUSTOM = "ISSM-CUSTOM"
     ISSM_MINIAPP_THERMAL = "ISSM-MINIAPP-THERMAL"
     ISSM_MINIAPP_STRESSBALANCE = "ISSM-MINIAPP-STRESSBALANCE"
     ISSM_4_18 = "ISSM-4-18"
 
     @classmethod
-    def get(self, app_name):
+    def get(cls, app_name):
         if app_name == App.ISSM_MINIAPP_THERMAL:
             return App.ISSM_MINIAPP_THERMAL
         elif app_name == App.ISSM_MINIAPP_STRESSBALANCE:
