@@ -89,7 +89,7 @@ class BaseRun:
         if vanilla:
             self.add_tool("VANILLA")
         # prepend time command for wall clock real time
-        self.prepend_run_command("/usr/bin/time -f %e")
+        #self.prepend_run_command("/usr/bin/time -f %e")
 
     def add_tool(self, name: str):
         """

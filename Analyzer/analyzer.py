@@ -493,7 +493,7 @@ class StdFileAnalyzer(BaseAnalyzer):
             # if job broke, there will just be the three std lines from the generator (plus maybe time output)
             if len(lines) <= 4:
                 return
-            self.calculation_time = float(lines[-4].split(":", 1)[1][1:-1])
+            self.calculation_time = float(lines[-3].split(":", 1)[1][1:-1])
             model_elm_sum = 0.0
             model_elm_cnt = 0.0
             model_loop_sum = 0.0
