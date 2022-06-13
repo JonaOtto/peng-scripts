@@ -75,6 +75,23 @@ if __name__ == '__main__':
     ))
     r.do_run()
 
+    r = Experiment(name="CALLGRIND-G16000")
+    r.add_run(CallgrindRun(
+        app=App.ISSM_MINIAPP_STRESSBALANCE,
+        resolution=Resolution.G16000,
+    ))
+    r.add_run(CallgrindRun(
+        app=App.ISSM_MINIAPP_STRESSBALANCE,
+        resolution=Resolution.G16000,
+        cache_sim=True,
+    ))
+    r.add_run(CallgrindRun(
+        app=App.ISSM_MINIAPP_STRESSBALANCE,
+        resolution=Resolution.G16000,
+        branch_sim=True,
+    ))
+    r.do_run()
+
 
     # r = Experiment(name="MPI-SCALE-TEST")
     # i = 3
