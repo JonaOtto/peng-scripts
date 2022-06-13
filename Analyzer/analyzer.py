@@ -426,7 +426,7 @@ class ResultAnalyzer:
                 self.results["results"][f"{job_id}"].update(results)
         if self.cvr_files is not {}:
             for job_id in self.cvr_files.keys():
-                cvr_analyzer = CompilerVectorizationReportAnalyzer(int(job_id), **self.cvr_files)
+                cvr_analyzer = CompilerVectorizationReportAnalyzer(int(job_id), **self.cvr_files[job_id])
                 job_id, configs, results = cvr_analyzer.analyze()
                 for name, cnf in configs.items():
                     self.results["jobs"][f"{job_id}"]["analyzed"].append({f"{name}": cnf.result_file})
