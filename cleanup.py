@@ -9,7 +9,8 @@ out_dir = "OUT"
 if __name__ == "__main__":
     jobids_to_keep = []
     for result_dir in os.listdir(f"{base_dir}/{res_dir}"):
-        with open(f"{base_dir}/{res_dir}/{result_dir}/{result_dir}.json", "r") as f:
+        file_name = "-".join(result_dir.split("-")[:-1])
+        with open(f"{base_dir}/{res_dir}/{result_dir}/{file_name}.json", "r") as f:
             jc = json.loads(f.read())
             for job in jc["jobs"].keys():
                 jobids_to_keep.append(job)
