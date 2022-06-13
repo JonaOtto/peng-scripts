@@ -67,6 +67,7 @@ if __name__ == '__main__':
         own_build=True,
         cleanup_build=True,
     ))
+    e.do_run()
 
 
     # e = Experiment(name="MINIAPPS-PLAIN-G16000")
