@@ -20,39 +20,53 @@ if __name__ == '__main__':
     #
     # ALL Apps gprof:
 
-    r = Experiment(name="GPROF_ALL_APPS_G16000")
-    # make vanilla runs to compare
-    r.add_run(BaseRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        cleanup_build=False
-    ))
-    r.add_run(BaseRun(
+    # r = Experiment(name="GPROF_ALL_APPS_G16000")
+    # # make vanilla runs to compare
+    # r.add_run(BaseRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     cleanup_build=False
+    # ))
+    # r.add_run(BaseRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=False,
+    #     cleanup_build=False
+    # ))
+    # # gprof miniapps
+    # r.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=False,
+    #     cleanup_build=False
+    # ))
+    # r.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=False,
+    #     cleanup_build=False
+    # ))
+    # # run the plain app to compare
+    # r.add_run(GProfRun(
+    #     app=App.ISSM_4_18,
+    #     resolution=Resolution.G16000,
+    #     cleanup_build=False
+    # ))
+    # r.do_run()
+
+    e = Experiment(name="VEC_REPORT_MINIAPPS")
+    e.add_run(CompilerVectorizationReportRun(
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
-        own_build=False,
-        cleanup_build=False
+        own_build=True,
+        cleanup_build=True,
     ))
-    # gprof miniapps
-    r.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=False,
-        cleanup_build=False
-    ))
-    r.add_run(GProfRun(
+    e.add_run(CompilerVectorizationReportRun(
         app=App.ISSM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000,
-        own_build=False,
-        cleanup_build=False
+        own_build=True,
+        cleanup_build=True,
     ))
-    # run the plain app to compare
-    r.add_run(GProfRun(
-        app=App.ISSM_4_18,
-        resolution=Resolution.G16000,
-        cleanup_build=False
-    ))
-    r.do_run()
 
 
     # e = Experiment(name="MINIAPPS-PLAIN-G16000")
