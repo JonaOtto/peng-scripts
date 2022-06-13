@@ -17,6 +17,6 @@ if __name__ == "__main__":
     for experiment in os.listdir(f"{base_dir}/{out_dir}"):
         if not experiment.split(".", 1)[1] in jobids_to_keep:
             print(f"Deleting {experiment}, it is not part of any result!")
-            # subprocess.run(["bash", "-c", f"rm -r {base_dir}/{out_dir}/{experiment}"])
+            subprocess.run(["bash", "-c", f"rm -r {base_dir}/{out_dir}/{experiment}"])
         else:
             print(f"{experiment} will be kept, it is part of an result!")
