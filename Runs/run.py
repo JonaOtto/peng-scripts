@@ -4,7 +4,7 @@ from typing import Tuple
 
 import SLURM.slurm
 from Builder.builder import BaseBuilder, App, Resolution, Compiler, GProfBuilder, CompilerVectorizationReportBuilder, \
-    CallgrindBuilder
+    CallgrindBuilder, ScorePBuilder
 from SLURM.default_slurm import DefaultPEngSlurmConfig
 
 # source and executable paths by app:
@@ -400,3 +400,10 @@ class MPIRun(BaseRun):
         super().__init__(app, resolution, *args, **kwargs, vanilla=False)
         self.builder = BaseBuilder(app, source_path[app])
         self.add_tool("MPI-COMPARE")
+
+
+class ScorePRun(BaseRun):
+    def __init__(self, app: App, resolution: Resolution, *args, **kwargs):
+        super().__init__(app, resolution, *args, **kwargs, vanilla=False)
+        self.builder = ScorePBuilder(app, source_path[app])
+        self.add_tool("SCORE-P")

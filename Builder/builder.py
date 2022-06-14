@@ -263,3 +263,17 @@ class CallgrindBuilder(BaseBuilder):
                          c_compiler_flags=f"'{build_defaults['c_compiler_flags']} -g'",
                          cxx_compiler_flags=f"'{build_defaults['cxx_compiler_flags']} -g'",
                          )
+
+
+class ScorePBuilder(BaseBuilder):
+
+    def __init__(self, app: App, source_path: str):
+        """
+        Constructor.
+        """
+        # https://valgrind.org/docs/manual/cl-manual.html#cl-manual.basics
+        # compile with -g and optimization (standard)
+        super().__init__(app, source_path,
+                         scorep_instrumentation=True,
+                         scorep_flags="",
+                         )
