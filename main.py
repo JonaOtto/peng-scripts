@@ -72,6 +72,7 @@ if __name__ == '__main__':
     e = Experiment(name="SCORE-P-RUNS")
     e.add_run(ScorePRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000))
     e.add_run(ScorePRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000))
+    e.do_run()
 
     # e = Experiment(name="MINIAPPS-PLAIN-G16000")
     # e.add_run(BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, cleanup_build=False))
