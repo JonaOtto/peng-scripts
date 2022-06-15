@@ -677,7 +677,7 @@ class GProfAnalyzer(BaseAnalyzer):
                         called = None
                         name = " ".join(elms[4:])
                     else:
-                        caller_ids.append(int(caller_line.split("[")[1][:-1]))
+                        caller_ids.append(int(caller_line.split("[")[1].split("]")[0]))
                         called = float(elms[4])
                         name = " ".join(elms[5:])
                 # [1]     98.1    0.00   50.61                 execute(int, char**, int, int, void (*)(FemModel*)) [1]
