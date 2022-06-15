@@ -407,3 +407,47 @@ class ScorePRun(BaseRun):
         super().__init__(app, resolution, *args, **kwargs, vanilla=False)
         self.builder = ScorePBuilder(app, source_path[app])
         self.add_tool("SCORE-P")
+
+
+class CachegrindRun(BaseRun):
+    """
+    Valgrind cachegrind run.
+    """
+
+    def __init__(self, app: App, resolution: Resolution, l1_size=64000, l1_associativity=2, l1_line=64, ll_size=71500000, ll_associativity=2, ll_line=64, *args, **kwargs):
+        """
+        Constructor.
+        """
+        super().__init__(app, resolution, builder=None, vanilla=False, *args, **kwargs)
+        self.builder = CallgrindBuilder(app, source_path[app])
+        self.add_tool("VALGRIND-CACHEGRIND")
+        self.prepend_run_command(f"valgrind --tool=cachegrind")
+        #    f"valgrind --tool=cachegrind --L1={l1_size},{l1_associativity},{l1_line} --LL={ll_size},{ll_associativity},{ll_line}")
+        # self.add_command("callgrind_control -b", bevor=False)
+        # add valgrind module
+        self.setup_slurm_config()  # setup slurm config upfront of prepare()
+        self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=False)
+        self.slurm_configuration.add_module(name="valgrind", version="3.16.1")
+
+    def cleanup(self, job_id: int, remove_build: bool = False):
+        super().cleanup(job_id, remove_build)
+        # find the correct out file (assuming only one version of them is there)
+        cachegrind_file = None
+        core_file = None
+        for file in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
+            if "cachegrind.out." in file:
+                callgrind_file = file
+            elif "vgcore." in file:
+                core_file = file
+        print(cachegrind_file)
+        print(core_file)
+        # backup files to out dir
+        skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
+        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}",
+                        f"{self.out_path}/{skeleton}.cachegrind-out"])
+        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}",
+                        f"{self.out_path}/{skeleton}.cachegrind-vgcore"])
+        # remove out files
+        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}")
+        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
+

@@ -2,26 +2,30 @@ from Runs.run import *
 from Management.experiment import Experiment
 
 if __name__ == '__main__':
-    e = Experiment(name="MINIAPPS-PLAIN-G16000")
-    e.add_run(BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
-    e.add_run(BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
-    e.do_run()
+    e = Experiment(name="CACHEGRIND_TEST")
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
 
-    r = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
-    # gprof miniapps
-    r.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    r.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True
-    ))
-    r.do_run()
+    # e = Experiment(name="MINIAPPS-PLAIN-G16000")
+    # e.add_run(BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e.add_run(BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e.do_run()
+    #
+    # r = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
+    # # gprof miniapps
+    # r.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # r.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True
+    # ))
+    # r.do_run()
     #
     # ALL Apps gprof:
 
