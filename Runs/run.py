@@ -419,7 +419,7 @@ class CachegrindRun(BaseRun):
         Constructor.
         """
         super().__init__(app, resolution, builder=None, vanilla=False, *args, **kwargs)
-        self.builder = CallgrindBuilder(app, source_path[app])
+        self.builder = BaseBuilder(app, source_path[app])
         self.add_tool("VALGRIND-CACHEGRIND")
         self.prepend_run_command(f"valgrind --tool=cachegrind")
         #    f"valgrind --tool=cachegrind --L1={l1_size},{l1_associativity},{l1_line} --LL={ll_size},{ll_associativity},{ll_line}")
