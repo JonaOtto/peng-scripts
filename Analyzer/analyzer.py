@@ -622,15 +622,26 @@ class GProfAnalyzer(BaseAnalyzer):
                             name=" ".join(elms[6:])
                         )
                     except (ValueError, IndexError):
-                        entry = _FlatProfileEntry(
-                            percentage_total=float(elms[0]),
-                            cumulated_secs=float(elms[1]),
-                            self_secs=float(elms[2]),
-                            calls_to_this=None,
-                            self_ms_calls=None,
-                            cumulated_ms_calls=None,
-                            name=" ".join(elms[3:])
-                        )
+                        try:
+                            entry = _FlatProfileEntry(
+                                percentage_total=float(elms[0]),
+                                cumulated_secs=float(elms[1]),
+                                self_secs=float(elms[2]),
+                                calls_to_this=None,
+                                self_ms_calls=None,
+                                cumulated_ms_calls=None,
+                                name=" ".join(elms[3:])
+                            )
+                        except (ValueError, IndexError):
+                            entry = _FlatProfileEntry(
+                                percentage_total=None,
+                                cumulated_secs=None,
+                                self_secs=None,
+                                calls_to_this=None,
+                                self_ms_calls=None,
+                                cumulated_ms_calls=None,
+                                name=None
+                            )
                     self.flat_profile.append(entry)
                 else:
                     break
