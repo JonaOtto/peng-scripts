@@ -611,7 +611,7 @@ class GProfAnalyzer(BaseAnalyzer):
                     elms = [elm.strip() for elm in elms if elm.strip() != ""]
                     if float(elms[0]) < self.threshold:
                         continue
-                    if len(elms) >= 6:
+                    try:
                         entry = _FlatProfileEntry(
                             percentage_total=float(elms[0]),
                             cumulated_secs=float(elms[1]),
@@ -621,7 +621,7 @@ class GProfAnalyzer(BaseAnalyzer):
                             cumulated_ms_calls=float(elms[5]),
                             name=" ".join(elms[6:])
                         )
-                    else:
+                    except (ValueError, IndexError):
                         entry = _FlatProfileEntry(
                             percentage_total=float(elms[0]),
                             cumulated_secs=float(elms[1]),
