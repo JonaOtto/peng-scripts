@@ -436,11 +436,8 @@ class CachegrindRun(BaseRun):
         core_file = None
         for file in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
             if "cachegrind.out." in file:
-                callgrind_file = file
-            elif "vgcore." in file:
-                core_file = file
+                cachegrind_file = file
         print(cachegrind_file)
-        print(core_file)
         # backup files to out dir
         skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
         subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}",
