@@ -13,12 +13,12 @@ if __name__ == '__main__':
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
         own_build=True,
-        cleanup_build=False,
+        cleanup_build=True,
     ))
     r.add_run(GProfRun(
         app=App.ISSM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000,
-        own_build=False,
+        own_build=True,
         cleanup_build=True
     ))
     r.do_run()
