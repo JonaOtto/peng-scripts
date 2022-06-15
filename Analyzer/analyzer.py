@@ -583,7 +583,7 @@ class GProfAnalyzer(BaseAnalyzer):
     Analyzer for GProf results.
     """
 
-    def __init__(self, job_id: int, profile: ExperimentConfig, threshold_percentage: float = 0.0):
+    def __init__(self, job_id: int, profile: ExperimentConfig, threshold_percentage: float = 0.01):
         """
         Constructor.
         """
