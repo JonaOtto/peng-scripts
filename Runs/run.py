@@ -434,17 +434,16 @@ class CachegrindRun(BaseRun):
         super().cleanup(job_id, remove_build)
         # find the correct out file (assuming only one version of them is there)
         cachegrind_file = None
-        core_file = None
         for file in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
             if "cachegrind.out." in file:
                 cachegrind_file = file
         print(cachegrind_file)
+        if not cachegrind_file:
+            return
         # backup files to out dir
         skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
         subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}",
                         f"{self.out_path}/{skeleton}.cachegrind-out"])
-        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}",
-                        f"{self.out_path}/{skeleton}.cachegrind-vgcore"])
         # remove out files
         #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}")
         #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
