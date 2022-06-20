@@ -22,6 +22,10 @@ class App:
             return App.ISSM_MINIAPP_STRESSBALANCE
         elif app_name == App.ISSM_4_18:
             return App.ISSM_4_18
+        elif app_name == App.ISSM_CUSTOM_MINIAPP_THERMAL:
+            return App.ISSM_CUSTOM_MINIAPP_THERMAL
+        elif app_name == App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE:
+            return App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE
         else:
             raise KeyError("App name not found.")
 
