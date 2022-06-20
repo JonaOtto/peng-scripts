@@ -406,9 +406,9 @@ class MPIRun(BaseRun):
 
 
 class ScorePRun(BaseRun):
-    def __init__(self, app: App, resolution: Resolution, *args, **kwargs):
+    def __init__(self, app: App, resolution: Resolution, use_automatic_compiler_instrumentation=True, *args, **kwargs):
         super().__init__(app, resolution, *args, **kwargs, vanilla=False)
-        self.builder = ScorePBuilder(app, source_path[app])
+        self.builder = ScorePBuilder(app, source_path[app], use_automatic_instrumentation=use_automatic_compiler_instrumentation)
         self.add_tool("SCORE-P")
 
 

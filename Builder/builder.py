@@ -268,7 +268,7 @@ class CallgrindBuilder(BaseBuilder):
 
 class ScorePBuilder(BaseBuilder):
 
-    def __init__(self, app: App, source_path: str):
+    def __init__(self, app: App, source_path: str, use_automatic_instrumentation=True):
         """
         Constructor.
         """
@@ -276,5 +276,5 @@ class ScorePBuilder(BaseBuilder):
         # compile with -g and optimization (standard)
         super().__init__(app, source_path,
                          scorep_instrumentation=True,
-                         scorep_flags="",
+                         scorep_flags="" if use_automatic_instrumentation else "--nocompiler",
                          )

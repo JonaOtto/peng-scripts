@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # e.do_run()
 
     e = Experiment(name="SCORE-P_REGIONS_TEST")
-    e.add_run(ScorePRun(app=App.ISSM_CUSTOM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    e.add_run(ScorePRun(app=App.ISSM_CUSTOM_MINIAPP_THERMAL, resolution=Resolution.G16000, use_automatic_compiler_instrumentation=False, own_build=True, cleanup_build=True))
     #e.add_run(ScorePRun(app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
     e.do_run()
 
