@@ -406,6 +406,10 @@ class MPIRun(BaseRun):
 
 
 class ScorePRun(BaseRun):
+
+    # With PAPI: export SCOREP_METRIC_PAPI=PAPI_TOT_INS,PAPI_FP_INS
+    # Use papi_avail, to check for metrics. Remember to module load papi
+
     def __init__(self, app: App, resolution: Resolution, use_automatic_compiler_instrumentation=True, *args, **kwargs):
         super().__init__(app, resolution, *args, **kwargs, vanilla=False)
         self.builder = ScorePBuilder(app, source_path[app], use_automatic_instrumentation=use_automatic_compiler_instrumentation)

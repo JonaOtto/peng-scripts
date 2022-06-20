@@ -280,5 +280,6 @@ class ScorePBuilder(BaseBuilder):
         # compile with -g and optimization (standard)
         super().__init__(app, source_path,
                          scorep_instrumentation=True,
-                         scorep_flags="" if use_automatic_instrumentation else "--nocompiler",
+                         scorep_flags="" if use_automatic_instrumentation else "--nocompiler --user",
+                         # if not automatic: disable automatic, enable manual with user
                          )
