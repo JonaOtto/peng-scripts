@@ -14,11 +14,14 @@ source_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp",
     App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp",
     App.ISSM_4_18: "issm-4.18",
-    App.ISSM_CUSTOM: "issm-custom"
+    App.ISSM_CUSTOM_MINIAPP_THERMAL: "issm-custom",
+    App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE: "issm-custom"
 }
 executable_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp/bin/miniappthermal.exe",
+    App.ISSM_CUSTOM_MINIAPP_THERMAL: "issm-custom/bin/miniappthermal.exe",
     App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp/bin/miniappstressbalance.exe",
+    App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE: "issm-custom/bin/miniappstressbalance.exe",
     App.ISSM_4_18: "issm-4.18/bin/issm.exe"
 }
 model_setup_path = {
