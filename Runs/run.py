@@ -414,17 +414,22 @@ class CachegrindRun(BaseRun):
     Valgrind cachegrind run.
     """
 
-    def __init__(self, app: App, resolution: Resolution, l1_size=64000, l1_associativity=2, l1_line=64, ll_size=71500000, ll_associativity=2, ll_line=64, *args, **kwargs):
+    def __init__(self, app: App, resolution: Resolution, append_args, l1_size=65536, l1_associativity=2, l1_line=64, ll_size=8388608, ll_associativity=2, ll_line=64, *args, **kwargs):
         """
         Constructor.
         """
         super().__init__(app, resolution, builder=None, vanilla=False, *args, **kwargs)
-        self.builder = BaseBuilder(app, source_path[app])
+        # callgrind like builder, because it uses -g flag
+        self.builder = CallgrindBuilder(app, source_path[app])
         self.add_tool("VALGRIND-CACHEGRIND")
         # self.prepend_run_command(f"valgrind --tool=cachegrind")
-        self.prepend_run_command(f"valgrind --tool=cachegrind"
-                                 f"valgrind --tool=cachegrind --L1={l1_size},{l1_associativity},{l1_line} --LL={ll_size},{ll_associativity},{ll_line}")
-        # self.add_command("callgrind_control -b", bevor=False)
+        if append_args:
+            self.prepend_run_command(f"valgrind --tool=cachegrind "
+                                     f"--D1={l1_size},{l1_associativity},{l1_line} --LL={ll_size},{ll_associativity},{ll_line}")
+        else:
+            self.prepend_run_command(f"valgrind --tool=cachegrind")
+        # add annotate
+        self.add_command("cg_annotate cachegrind.out.*", bevor=False)
         # add valgrind module
         self.setup_slurm_config()  # setup slurm config upfront of prepare()
         self.slurm_configuration.set_system_info(uses_module_system=True, purge_modules_at_start=False)
