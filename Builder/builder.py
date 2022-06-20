@@ -276,8 +276,6 @@ class ScorePBuilder(BaseBuilder):
         """
         Constructor.
         """
-        # https://valgrind.org/docs/manual/cl-manual.html#cl-manual.basics
-        # compile with -g and optimization (standard)
         super().__init__(app, source_path,
                          scorep_instrumentation=True,
                          scorep_flags="" if use_automatic_instrumentation else "--user --nocompiler",
