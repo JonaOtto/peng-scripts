@@ -411,6 +411,17 @@ class ScorePRun(BaseRun):
         self.builder = ScorePBuilder(app, source_path[app], use_automatic_instrumentation=use_automatic_compiler_instrumentation)
         self.add_tool("SCORE-P")
 
+    def cleanup(self, job_id: int, remove_build: bool = False):
+        super().cleanup(job_id, remove_build)
+        # copy score-p folder to OUT
+        scorep_file = None
+        for entry in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
+            if "scorep" in entry:
+                scorep_file = entry
+        skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
+        subprocess.run(["cp", "-r", f"{self.home_dir}/{model_setup_path[self.resolution]}/{scorep_file}",
+                        f"{self.out_path}/{skeleton}.scorep-results"])
+
 
 class CachegrindRun(BaseRun):
     """
