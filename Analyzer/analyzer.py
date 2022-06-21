@@ -10,7 +10,7 @@ default_out_dir = "/home/kurse/kurs00054/jo83xafu/issm-output/OUT"
 lichtenberg_defaults = {
     "os": "RedHat",
     "os_version": "8.5",
-    "cpu": "Intel AVX-512",
+    "cpu": "Intel® Xeon® Platinum 9242",
     "cpu_cores": 48,
     "cpu_count": 2,
     "mem": 38400,  # In MB
@@ -102,7 +102,7 @@ class ExperimentConfig:
     def is_comparable(self, other):
         """
         Check if a ExperimentConfig is comparable with another. This means everything should be equal but the
-        result_file, job_id, source_path and the compiler flags. Also Apps and Resolution are not included in this:
+        result_file, job_id, source_path and the compiler flags. Also, Apps and Resolution are not included in this:
         USE WITH CARE!!
         There may be cases where it is useful to have other "equal" definitions. They must be implemented on their own.
         """
@@ -115,6 +115,9 @@ class ExperimentConfig:
             self.cpu_frequency_setting == other.cpu_frequency_setting and \
             self.gcc_version == other.gcc_version and \
             self.llvm_version == other.llvm_version and \
+            self.c_compiler_flags == other.c_compiler_flags and \
+            self.fortran_compiler_flags == other.fortran_compiler_flags and \
+            self.cxx_compiler_flags == other.cxx_compiler_flags and \
             self.petsc_version == other.petsc_version and \
             self.scorep_instrumentation == other.scorep_instrumentation and \
             self.scorep_flags == other.scorep_flags and \
@@ -492,7 +495,7 @@ class StdFileAnalyzer(BaseAnalyzer):
             lines = f.readlines()
             # if job broke, there will just be the three std lines from the generator (plus maybe time output)
             if len(lines) <= 4:
-                return
+                return None
             self.calculation_time = float(lines[-3].split(":", 1)[1][1:-1])
             model_elm_sum = 0.0
             model_elm_cnt = 0.0
@@ -531,6 +534,8 @@ class StdFileAnalyzer(BaseAnalyzer):
         """
         with open(path, "r") as f:
             lines = f.readlines()
+            if len(lines) <= 4:
+                return None
             for line in lines:
                 if line.startswith("   FemModel initialization elapsed time"):
                     self.setup_time = float(line.split(":")[1].strip())
@@ -553,21 +558,28 @@ class StdFileAnalyzer(BaseAnalyzer):
 
     def analyze(self):
         print(f"\n\nANALYZING STD OUT for job: {self.job_id}")
+        configs = {}
+        if self.out_cnf:
+            configs["out"] = self.out_cnf
+        if self.err_cnf:
+            configs["err"] = self.err_cnf
         if self.out_cnf:
             if self.out_cnf.app != App.ISSM_4_18:
-                self.read_out_file(self.out_cnf.result_file)
+                if not self.read_out_file(self.out_cnf.result_file):
+                    # return error in case of error
+                    return self.job_id, configs, {"error": True, "message": "ISSM did not run! Check with error file!",
+                                                  "error_file": None if not self.err_cnf else self.err_cnf.result_file}
             else:
-                self.read_out_file_418(self.out_cnf.result_file)
+                if not self.read_out_file_418(self.out_cnf.result_file):
+                    # return error in case of error
+                    return self.job_id, configs, {"error": True, "message": "ISSM did not run! Check with error file!",
+                                                  "error_file": None if not self.err_cnf else self.err_cnf.result_file}
         print(f"Calculation Time: {self.calculation_time}")
         print(f"Setup Time: {self.setup_time}")
         print(f"Total Time: {self.total_time}")
         print(f"Model element count average: {self.model_elements_avg}")
         print(f"Model loop count average: {self.model_loops_avg}")
-        configs = {}
-        if self.out_cnf:
-            configs["out"] = self.out_cnf
-        if self.out_cnf:
-            configs["err"] = self.err_cnf
+
         results = {
             "setup_time": self.setup_time,
             "calculation_time": self.calculation_time,
@@ -729,6 +741,55 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         self.opt_cnf = opt
         self.miss_cnf = miss
 
+    def read_file(self, result_file) -> dict:
+        with open(result_file, "r") as f:
+            results = {}
+            """ Dict: Keys are the files,
+                which hold lists of dicts like {
+                # line: line number of the loop
+                # column: column of the loop
+                # vectorized: t/f
+                # vector_bytes if yes else None
+                # reason (if not) else None
+            } """
+            for line in f.readlines():
+                try:
+                    source, line, column, result, rest = line.split(":", 4)
+                    if "note" in result:
+                        continue
+                    elif "missed" in result and "statement clobbers memory" in rest:
+                        continue
+                    if source not in results:
+                        results[source] = []
+                    if "missed" in result:
+                        try:
+                            results[source].append({
+                                "line": int(line),
+                                "column": int(column),
+                                "vectorized": False,
+                                "vector_bits": None,
+                                "reason": rest.split(":", 1)[1]
+                            })
+                        except Exception as e:
+                            print("Something went wrong reading CVR report: ", e)
+                    elif "optimized" in result:
+                        try:
+                            results[source].append({
+                                "line": int(line),
+                                "column": int(column),
+                                "vectorized": True,
+                                "vector_bits": 8*int(rest.split(" bytes")[0].split(" ")[-1]),
+                                "reason": None,
+                            })
+                        except Exception as e:
+                            print("Something went wrong reading CVR report: ", e)
+                    else:
+                        continue
+                except IndexError:
+                    continue
+            return results
+
+
     def analyze(self):
         print("\n\nANALYZING CVR!!")
         print(self.all_cnf)
@@ -741,7 +802,16 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
             configs["opt"] = self.opt_cnf
         if self.miss_cnf:
             configs["miss"] = self.miss_cnf
+        # TODO: Actually extract the stuff from the files!
+        """
+        But for the paper in this case it was easier to just use Ctrl+F on the output files.
+        """
         results = {}
+        if self.all_cnf:
+            results = self.read_file(self.all_cnf.result_file)
+        elif self.opt_cnf and self.miss_cnf:
+            results = self.read_file(self.opt_cnf.result_file)
+            results.update(self.read_file(self.miss_cnf.result_file))
         return self.job_id, configs, results
 
 

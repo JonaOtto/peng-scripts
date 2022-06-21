@@ -470,7 +470,7 @@ class SlurmConfiguration:
             except FileNotFoundError:
                 raise CommandExecutionException(f"sbatch {self.__slurm_script_file}", non_zero=False, invalid=True)
 
-    def __check_squeue(self, job_id: int) -> bool:
+    def __check_squeue(self, job_id: int, waited_time: int) -> bool:
         """
         Checks the output of the "squeue" commands and returns whether job with that id is completed or not.
         :param job_id: The job id to find status for.
@@ -484,13 +484,17 @@ class SlurmConfiguration:
         sq = sq.stdout.decode("utf-8")
         for line in sq.splitlines():
             job_id_squeue, state, time_elapsed = line.split(" ")
+            # Lichtenbergs SLURM outputs something like "COMPLETI", not COMPLETED:
             if str(job_id) == job_id_squeue and "COMP" in state:
-                print(f"Your Job {job_id_squeue} is COMPLETED (Time spend: {time_elapsed} min).\n")
+                print(f"Your Job {job_id_squeue} is COMPLETED (Time spent running: {time_elapsed} min; waiting: {waited_time} sec.).")
+                print(f"SUMMARY: Your Job {job_id_squeue} was running for {time_elapsed} seconds, after waiting for {waited_time} seconds.\n")
                 return True
             elif str(job_id) == job_id_squeue:
-                print(f"Your Job {job_id_squeue} is still {state} (Time spent: {time_elapsed} min).")
+                print(f"Your Job {job_id_squeue} is still {state} (Time spend running: {time_elapsed} min; waiting: {waited_time} sec.).")
                 print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.\n")
                 return False
+        print(f"Your Job {job_id} is COMPLETED.")
+        print(f"SUMMARY: Your Job {job_id} was running, after waiting for {waited_time} seconds.\n")
         return True
 
     def wait(self, job_id):
@@ -499,6 +503,8 @@ class SlurmConfiguration:
         :return: It will return the paths to the result files of the job.
         """
         self.job_id = job_id
-        while not self.__check_squeue(job_id):
+        waited = 0
+        while not self.__check_squeue(job_id, waited):
             time.sleep(SQUEUE_CHECK_INTERVAL)
+            waited += SQUEUE_CHECK_INTERVAL
         return int(self.job_id), f"{self.__std_out_path}.{job_id}", f"{self.__std_err_path}.{job_id}"
