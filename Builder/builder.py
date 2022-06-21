@@ -272,12 +272,14 @@ class CallgrindBuilder(BaseBuilder):
 
 class ScorePBuilder(BaseBuilder):
 
-    def __init__(self, app: App, source_path: str, use_automatic_instrumentation=True):
+    def __init__(self, app: App, source_path: str, compiler_instrumentation=True, user_instrumentation=False):
         """
         Constructor.
         """
+        comp = "--compiler" if compiler_instrumentation else "--nocompiler"
+        user = "--user" if user_instrumentation else ""
+        flags = f"{comp} {user}"
         super().__init__(app, source_path,
                          scorep_instrumentation=True,
-                         scorep_flags="" if use_automatic_instrumentation else "'--user --nocompiler'",
-                         # if not automatic: disable automatic, enable manual with user
+                         scorep_flags=flags,
                          )
