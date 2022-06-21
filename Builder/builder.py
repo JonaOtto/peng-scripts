@@ -278,7 +278,7 @@ class ScorePBuilder(BaseBuilder):
         """
         comp = "--compiler" if compiler_instrumentation else "--nocompiler"
         user = "--user" if user_instrumentation else ""
-        flags = f"{comp} {user}"
+        flags = f"'{comp} {user}'"
         super().__init__(app, source_path,
                          scorep_instrumentation=True,
                          scorep_flags=flags,
