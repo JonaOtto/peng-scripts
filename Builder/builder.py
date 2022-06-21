@@ -8,11 +8,12 @@ class App:
     """
     Enum for App to run.
     """
-    ISSM_CUSTOM_MINIAPP_STRESSBALANCE = "ISSM-CUSTOM-STRESSBALANCE"
-    ISSM_CUSTOM_MINIAPP_THERMAL = "ISSM-CUSTOM-THERMAL"
+    ISSM_CUSTOM_MINIAPP_STRESSBALANCE = "ISSM-CUSTOM-MINIAPP-STRESSBALANCE"
+    ISSM_CUSTOM_MINIAPP_THERMAL = "ISSM-CUSTOM-MINIAPP-THERMAL"
     ISSM_MINIAPP_THERMAL = "ISSM-MINIAPP-THERMAL"
     ISSM_MINIAPP_STRESSBALANCE = "ISSM-MINIAPP-STRESSBALANCE"
     ISSM_4_18 = "ISSM-4-18"
+    ISSM_CUSTOM_4_18 = "ISSM_CUSTOM_4_18"
 
     @classmethod
     def get(cls, app_name):
@@ -26,6 +27,8 @@ class App:
             return App.ISSM_CUSTOM_MINIAPP_THERMAL
         elif app_name == App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE:
             return App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE
+        elif app_name == App.ISSM_CUSTOM_4_18:
+            return App.ISSM_CUSTOM_4_18
         else:
             raise KeyError("App name not found.")
 
