@@ -29,7 +29,7 @@ class DefaultPEngSlurmConfig(SlurmConfiguration):
                          job_name=job_name,
                          std_out_path=std_out_path,
                          std_err_path=std_err_path,
-                         time_str="00:14:00",
+                         time_str="00:30:00",
                          mem_per_cpu=3800,
                          number_of_tasks=1,
                          number_of_cores_per_task=num_mpi_ranks,
