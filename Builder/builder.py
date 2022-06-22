@@ -280,10 +280,11 @@ class CallgrindBuilder(BaseBuilder):
 
 class ScorePBuilder(BaseBuilder):
 
-    def __init__(self, app: App, source_path: str, compiler_instrumentation=True, user_instrumentation=False):
+    def __init__(self, app: App, source_path: str, compiler_instrumentation=True, user_instrumentation=False, papi_metrics=[]):
         """
         Constructor.
         """
+        self.papi_metrics = ",".join(papi_metrics)
         comp = "--compiler" if compiler_instrumentation else "--nocompiler"
         user = "--user" if user_instrumentation else ""
         flags = f"'{comp} {user}'"
@@ -291,3 +292,12 @@ class ScorePBuilder(BaseBuilder):
                          scorep_instrumentation=True,
                          scorep_flags=flags,
                          )
+
+    def build(self, active: bool = True):
+        if not active:
+            std_cmd = super().build(active=False)
+            return f"export SCOREP_METRIC_PAPI={self.papi_metrics};{std_cmd}"
+        else:
+            subprocess.run(["bash", "-c", f"export SCOREP_METRIC_PAPI={self.papi_metrics}"])
+            super().build(active=True)
+            return

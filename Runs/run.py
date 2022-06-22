@@ -451,7 +451,6 @@ class ScorePRun(BaseRun):
         self.builder = ScorePBuilder(app, source_path[app], compiler_instrumentation=compiler_instrumentation,
                                      user_instrumentation=user_instrumentation)
         self.add_tool("SCORE-P")
-        self.add_command("export SCOREP_METRIC_PAPI=PAPI_L1_TCM,PAPI_L3_TCM,PAPI_L3_DCM,PAPI_L1_DCM,PAPI_FP_INS", bevor=True)
 
     def cleanup(self, job_id: int, remove_build: bool = False):
         # move score-p folder to OUT
