@@ -58,11 +58,14 @@ class Resolution:
 
 class Compiler:
     GCC = "GCC"
+    LLVM = "LLVM"
 
     @classmethod
     def get(cls, compiler_name):
         if compiler_name == Compiler.GCC:
             return Compiler.GCC
+        elif compiler_name == Compiler.LLVM:
+            return Compiler.LLVM
         else:
             raise KeyError("Compiler not found.")
 
