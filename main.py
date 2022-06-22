@@ -90,13 +90,13 @@ if __name__ == '__main__':
 
     e = Experiment(name="VEC_REPORT_MINIAPPS")
     e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_MINIAPP_THERMAL,
+        app=App.ISSM_CUSTOM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
         own_build=True,
         cleanup_build=True,
     ))
     e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
+        app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE,
         resolution=Resolution.G16000,
         own_build=True,
         cleanup_build=True,
