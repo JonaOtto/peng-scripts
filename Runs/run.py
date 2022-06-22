@@ -14,7 +14,9 @@ source_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp",
     App.ISSM_MINIAPP_STRESSBALANCE: "issm-miniapp",
     App.ISSM_4_18: "issm-4.18",
-    App.ISSM_CUSTOM_MINIAPP_THERMAL: "issm-custom",
+    App.ISSM_ANNOTATED_MINIAPP_THERMAL: "issm-annotated",
+    App.ISSM_ANNOTATED_MINIAPP_STRESSBALANCE: "issm-annotated",
+App.ISSM_CUSTOM_MINIAPP_THERMAL: "issm-custom",
     App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE: "issm-custom"
 }
 executable_path = {
@@ -443,6 +445,7 @@ class ScorePRun(BaseRun):
         self.builder = ScorePBuilder(app, source_path[app], compiler_instrumentation=compiler_instrumentation,
                                      user_instrumentation=user_instrumentation)
         self.add_tool("SCORE-P")
+        self.add_command("SCOREP_METRIC_PAPI=PAPI_L1_TCM,PAPI_L3_TCM,PAPI_L3_DCM,PAPI_L1_DCM,PAPI_FP_INS", bevor=True)
 
     def cleanup(self, job_id: int, remove_build: bool = False):
         super().cleanup(job_id, remove_build)
