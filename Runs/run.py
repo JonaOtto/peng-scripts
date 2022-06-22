@@ -17,7 +17,9 @@ source_path = {
     App.ISSM_ANNOTATED_MINIAPP_THERMAL: "issm-annotated",
     App.ISSM_ANNOTATED_MINIAPP_STRESSBALANCE: "issm-annotated",
     App.ISSM_CUSTOM_MINIAPP_THERMAL: "issm-custom",
-    App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE: "issm-custom"
+    App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE: "issm-custom",
+    App.ISSM_CUSTOM_ANNOTATED_MINIAPP_THERMAL: "issm-custom-annotated",
+    App.ISSM_CUSTOM_ANNOTATED_MINIAPP_STRESSBALANCE: "issm-custom-annotated",
 }
 executable_path = {
     App.ISSM_MINIAPP_THERMAL: "issm-miniapp/bin/miniappthermal.exe",
@@ -27,6 +29,8 @@ executable_path = {
     App.ISSM_4_18: "issm-4.18/bin/issm.exe",
     App.ISSM_ANNOTATED_MINIAPP_THERMAL: "issm-annotated/bin/miniappthermal.exe",
     App.ISSM_ANNOTATED_MINIAPP_STRESSBALANCE: "issm-annotated/bin/miniappstressbalance.exe",
+    App.ISSM_CUSTOM_ANNOTATED_MINIAPP_THERMAL: "issm-custom-annotated/bin/miniappthermal.exe",
+    App.ISSM_CUSTOM_ANNOTATED_MINIAPP_STRESSBALANCE: "issm-custom-annotated/bin/miniappstressbalance.exe",
 }
 model_setup_path = {
     Resolution.G4000: "greenland-setup/G4000",
