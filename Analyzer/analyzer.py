@@ -147,6 +147,9 @@ class ExperimentConfig:
             "cpu_frequency_setting": self.cpu_frequency_setting,
             "gcc_version": self.gcc_version,
             "llvm_version": self.llvm_version,
+            "c_compiler_flags": self.c_compiler_flags,
+            "fortran_compiler_flags": self.fortran_compiler_flags,
+            "cxx_compiler_flags": self.cxx_compiler_flags,
             "petsc_version": self.petsc_version,
             "scorep_instrumentation": self.scorep_instrumentation,
             "scorep_flags": self.scorep_flags,
@@ -172,9 +175,6 @@ class ExperimentConfig:
                 "source_path": self.source_path,
                 "app": self.app,
                 "model": self.resolution,
-                "c_compiler_flags": self.c_compiler_flags,
-                "fortran_compiler_flags": self.fortran_compiler_flags,
-                "cxx_compiler_flags": self.cxx_compiler_flags,
             })
             return res
 
