@@ -495,7 +495,7 @@ class StdFileAnalyzer(BaseAnalyzer):
             lines = f.readlines()
             # if job broke, there will just be the three std lines from the generator (plus maybe time output)
             if len(lines) <= 4:
-                return None
+                return False
             self.calculation_time = float(lines[-3].split(":", 1)[1][1:-1])
             model_elm_sum = 0.0
             model_elm_cnt = 0.0
@@ -527,6 +527,7 @@ class StdFileAnalyzer(BaseAnalyzer):
             self.setup_time = self.setup_time
             self.model_elements_avg = model_elm_sum / model_elm_cnt
             self.model_loops_avg = model_loop_sum / model_loop_cnt
+        return True
 
     def read_out_file_418(self, path):
         """
@@ -535,7 +536,7 @@ class StdFileAnalyzer(BaseAnalyzer):
         with open(path, "r") as f:
             lines = f.readlines()
             if len(lines) <= 4:
-                return None
+                return False
             for line in lines:
                 if line.startswith("   FemModel initialization elapsed time"):
                     self.setup_time = float(line.split(":")[1].strip())
@@ -555,6 +556,7 @@ class StdFileAnalyzer(BaseAnalyzer):
                     if len(str(seconds)) == 1:
                         seconds = f"0{seconds}"
                     self.total_time = f"{hours}:{minutes}:{seconds}"
+        return True
 
     def analyze(self):
         print(f"\n\nANALYZING STD OUT for job: {self.job_id}")

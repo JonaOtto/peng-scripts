@@ -32,8 +32,11 @@ class Experiment:
         print(f"Starting experiment: {self.name}")
         for run in self.runs:
             print(f"Starting run {run.jobname_skeleton} from experiment {self.name}")
-            out_dir, builder_config, job_config = run.do_run()
-            self.__run_res_tuples.append((out_dir, builder_config, job_config))
+            try:
+                out_dir, builder_config, job_config = run.do_run()
+                self.__run_res_tuples.append((out_dir, builder_config, job_config))
+            except Exception:
+                print("AAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHRRRRRRRRRRRRRRGGGGGGGGGGGGGGG")
         print(f"Starting analyzing on experiment: {self.name}")
 
         """ 

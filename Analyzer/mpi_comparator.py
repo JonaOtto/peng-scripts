@@ -25,8 +25,8 @@ class MPIComparator:
         self.results["mpi_compare"]["average"] = sum([ct[1]["calculation_time"] for ct in self.intermediate_res])/len(self.intermediate_res)
 
     def export_graph(self):
-        # FIXME: The whole programm fails, if runned on an venv. But: We need a venv for
-        # FIXME ... matplotlib! How? Why is this happening? I guess something with subprocesses..
+        # FIXME: The whole programm fails, if started from a venv. But: We need a venv for matplotlib if we want to generate plots
+        # FIXME ... matplotlib! How? Why is this happening? I guess something with subprocesses...
         pass
 
     def analyze(self):

@@ -381,7 +381,6 @@ class CallgrindRun(BaseRun):
         self.slurm_configuration.add_module(name="valgrind", version="3.16.1")
 
     def cleanup(self, job_id: int, remove_build: bool = False):
-        super().cleanup(job_id, remove_build)
         # find the correct out file (assuming only one version of them is there)
         callgrind_file = None
         core_file = None
@@ -401,6 +400,7 @@ class CallgrindRun(BaseRun):
         # remove out files
         #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}")
         #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
+        super().cleanup(job_id, remove_build)
 
 
 class MPIRun(BaseRun):
@@ -451,16 +451,16 @@ class ScorePRun(BaseRun):
         self.builder = ScorePBuilder(app, source_path[app], compiler_instrumentation=compiler_instrumentation,
                                      user_instrumentation=user_instrumentation)
         self.add_tool("SCORE-P")
-        self.add_command("SCOREP_METRIC_PAPI=PAPI_L1_TCM,PAPI_L3_TCM,PAPI_L3_DCM,PAPI_L1_DCM,PAPI_FP_INS", bevor=True)
+        self.add_command("export SCOREP_METRIC_PAPI=PAPI_L1_TCM,PAPI_L3_TCM,PAPI_L3_DCM,PAPI_L1_DCM,PAPI_FP_INS", bevor=True)
 
     def cleanup(self, job_id: int, remove_build: bool = False):
-        super().cleanup(job_id, remove_build)
-        # copy score-p folder to OUT
+        # move score-p folder to OUT
         for entry in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
             if "scorep" in entry:
                 skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
                 subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{entry}",
                                 f"{self.out_path}/{skeleton}.{entry}"])
+        super().cleanup(job_id, remove_build)
 
 
 class CachegrindRun(BaseRun):
