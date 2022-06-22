@@ -88,7 +88,7 @@ if __name__ == '__main__':
     # ))
     # r.do_run()
 
-    e = Experiment(name="VEC_REPORT_MINIAPPS")
+    e = Experiment(name="VEC_REPORT_MINIAPPS_CUSTOM")
     e.add_run(CompilerVectorizationReportRun(
         app=App.ISSM_CUSTOM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
