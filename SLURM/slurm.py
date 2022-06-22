@@ -486,15 +486,15 @@ class SlurmConfiguration:
             job_id_squeue, state, time_elapsed = line.split(" ")
             # Lichtenbergs SLURM outputs something like "COMPLETI", not COMPLETED:
             if str(job_id) == job_id_squeue and "COMP" in state:
-                print(f"Your Job {job_id_squeue} is COMPLETED (Time spent: {time_elapsed} min, waiting: {waited_time} sec).")
-                print(f"SUMMARY: Your Job {job_id_squeue} was running for {time_elapsed} seconds, after waiting for {waited_time} seconds.\n")
+                print(f"Your Job {job_id_squeue} is COMPLETED (Time spent: {time_elapsed} min, total: {waited_time} sec).")
+                print(f"SUMMARY: Your Job {job_id_squeue} was running for {time_elapsed} seconds, total time {waited_time} seconds.\n")
                 return True
             elif str(job_id) == job_id_squeue:
-                print(f"Your Job {job_id_squeue} is still {state} (Time spent running: {time_elapsed} min, waiting: {waited_time} sec).")
+                print(f"Your Job {job_id_squeue} is still {state} (Time spent running: {time_elapsed} min, total: {waited_time} sec).")
                 print(f"Will check again in {SQUEUE_CHECK_INTERVAL} seconds.\n")
                 return False
         print(f"Your Job {job_id} is COMPLETED.")
-        print(f"SUMMARY: Your Job {job_id} has finished running, after waiting for {waited_time} seconds.\n")
+        print(f"SUMMARY: Your Job {job_id} has finished running, total time for {waited_time} seconds.\n")
         return True
 
     def wait(self, job_id):
