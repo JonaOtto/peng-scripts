@@ -447,13 +447,11 @@ class ScorePRun(BaseRun):
     def cleanup(self, job_id: int, remove_build: bool = False):
         super().cleanup(job_id, remove_build)
         # copy score-p folder to OUT
-        # scorep_results = None
-        # for entry in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
-        #     if "scorep" in entry:
-        #         scorep_results = entry
-        # skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
-        # subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{scorep_results}",
-        #                 f"{self.out_path}/{skeleton}.scorep-results/"])
+        for entry in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
+            if "scorep" in entry:
+                skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
+                subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{entry}",
+                                f"{self.out_path}/{skeleton}.{entry}"])
 
 
 class CachegrindRun(BaseRun):
