@@ -6,14 +6,14 @@ from SLURM.exceptions import CommandExecutionException
 
 class App:
     """
-    Enum for App to run.
+    Enum for App to run. The corresponding strings should not contain underscores this would crash the analyzers.
     """
     ISSM_CUSTOM_MINIAPP_STRESSBALANCE = "ISSM-CUSTOM-MINIAPP-STRESSBALANCE"
     ISSM_CUSTOM_MINIAPP_THERMAL = "ISSM-CUSTOM-MINIAPP-THERMAL"
     ISSM_MINIAPP_THERMAL = "ISSM-MINIAPP-THERMAL"
     ISSM_MINIAPP_STRESSBALANCE = "ISSM-MINIAPP-STRESSBALANCE"
     ISSM_4_18 = "ISSM-4-18"
-    ISSM_CUSTOM_4_18 = "ISSM_CUSTOM_4_18"
+    ISSM_CUSTOM_4_18 = "ISSM-CUSTOM-4-18"
 
     @classmethod
     def get(cls, app_name):
@@ -55,14 +55,11 @@ class Resolution:
 
 class Compiler:
     GCC = "GCC"
-    LLVM = "LLVM"
 
     @classmethod
     def get(cls, compiler_name):
         if compiler_name == Compiler.GCC:
             return Compiler.GCC
-        elif compiler_name == Compiler.LLVM:
-            return Compiler.LLVM
         else:
             raise KeyError("Compiler not found.")
 

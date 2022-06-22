@@ -408,7 +408,35 @@ class MPIRun(BaseRun):
 class ScorePRun(BaseRun):
 
     # With PAPI: export SCOREP_METRIC_PAPI=PAPI_TOT_INS,PAPI_FP_INS
+    """
+    PAPI:
+
+    PAPI_FP_OPS - Flops (no)
+    PAPI_SP_OPS - Floating point operations; optimized to count scaled single precision vector operations
+    PAPI_DP_OPS - Floating point operations; optimized to count scaled double precision vector operations
+    PAPI_VEC_SP - Single precision vector/SIMD instructions
+    PAPI_VEC_DP - Double precision vector/SIMD instructions
+    PAPI_L1_TCM - L1 cache misses
+    PAPI_L1_DCM - L1 DATA cache misses
+    PAPI_L3_TCM - L3 cache misses
+    PAPI_FUL_CCY - Cycles with max instruction completed
+    PAPI_FMA_INS - FMA Instructions completed
+    PAPI_FP_INS - Floating point instructions (no)
+    PAPI_VEC_INS - Vector/SIMD instructions (could include integer) (no)
+    PAPI_FML_INS - Flop multiply instructions (no)
+    PAPI_FAD_INS - Flop add instructions (no)
+
+    """
     # Use papi_avail, to check for metrics. Remember to module load papi
+    # END ans Ende verschieben
+    # cube dump mit oder cube gui
+    # automatic load imbalance paper
+    #
+    # peak performance: mit ohne AVX: PIN intel: instruction mix
+    # mit Optimierung aus und einschalten, oder --ftree optionen wie bei CVR.
+
+    # likwid (topology) numctl, intel developer guide, performance software architecture optimaization guide
+    #
 
     def __init__(self, app: App, resolution: Resolution, compiler_instrumentation=True, user_instrumentation=False, *args, **kwargs):
         super().__init__(app, resolution, *args, **kwargs, vanilla=False)
@@ -419,13 +447,13 @@ class ScorePRun(BaseRun):
     def cleanup(self, job_id: int, remove_build: bool = False):
         super().cleanup(job_id, remove_build)
         # copy score-p folder to OUT
-        scorep_results = None
-        for entry in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
-            if "scorep" in entry:
-                scorep_results = entry
-        skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
-        subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{scorep_results}",
-                        f"{self.out_path}/{skeleton}.scorep-results/"])
+        # scorep_results = None
+        # for entry in os.listdir(f"{self.home_dir}/{model_setup_path[self.resolution]}"):
+        #     if "scorep" in entry:
+        #         scorep_results = entry
+        # skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
+        # subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{scorep_results}",
+        #                 f"{self.out_path}/{skeleton}.scorep-results/"])
 
 
 class CachegrindRun(BaseRun):

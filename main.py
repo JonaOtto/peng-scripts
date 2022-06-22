@@ -2,10 +2,10 @@ from Runs.run import *
 from Management.experiment import Experiment
 
 if __name__ == '__main__':
-    e = Experiment(name="MINIAPPS-PLAIN-G16000")
-    e.add_run(BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
-    e.add_run(BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
-    e.do_run()
+    # e = Experiment(name="MINIAPPS-PLAIN-G16000")
+    # e.add_run(BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e.add_run(BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e.do_run()
 
     # e = Experiment(name="CACHEGRIND_WO_ARGS")
     # e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, append_args=False, own_build=True, cleanup_build=True))
@@ -24,15 +24,15 @@ if __name__ == '__main__':
     #                         cleanup_build=True))
     # e.do_run()
 
-    e = Experiment(name="SCORE-P_REGIONS_TEST")
+    e = Experiment(name="SCORE-P-REGIONS")
     e.add_run(ScorePRun(app=App.ISSM_CUSTOM_MINIAPP_THERMAL, resolution=Resolution.G16000,
                         compiler_instrumentation=False,
                         user_instrumentation=True,
                         own_build=True, cleanup_build=True))
-    e.add_run(ScorePRun(app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000,
-                        compiler_instrumentation=False,
-                        user_instrumentation=True,
-                        own_build=True, cleanup_build=True))
+    # e.add_run(ScorePRun(app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000,
+    #                     compiler_instrumentation=False,
+    #                     user_instrumentation=True,
+    #                     own_build=True, cleanup_build=True))
     e.do_run()
 
     #
@@ -88,20 +88,20 @@ if __name__ == '__main__':
     # ))
     # r.do_run()
 
-    e = Experiment(name="VEC_REPORT_MINIAPPS")
-    e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.do_run()
+    # e = Experiment(name="VEC_REPORT_MINIAPPS")
+    # e.add_run(CompilerVectorizationReportRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.add_run(CompilerVectorizationReportRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.do_run()
 
     # e = Experiment(name="SCORE-P-RUNS")
     # e.add_run(ScorePRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000))
