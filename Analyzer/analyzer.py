@@ -759,7 +759,10 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
             } """
             for line in f.readlines():
                 try:
-                    source, line, column, result, rest = line.split(":", 4)
+                    try:
+                        source, line, column, result, rest = line.split(":", 4)
+                    except ValueError:
+                        continue
                     if "note" in result:
                         continue
                     elif "missed" in result and "statement clobbers memory" in rest:
@@ -768,22 +771,26 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
                         results[source] = []
                     if "missed" in result:
                         try:
+                            reason = rest.split(":", 1)[1]
+                        except IndexError:
+                            reason = rest
+                        try:
                             results[source].append({
                                 "line": int(line),
                                 "column": int(column),
                                 "vectorized": False,
                                 "vector_bits": None,
-                                "reason": rest.split(":", 1)[1]
+                                "reason": reason
                             })
                         except Exception as e:
-                            print("Something went wrong reading CVR report: ", e)
+                            print("Something went wrong reading CVR report: ", e,"::", type(e))
                     elif "optimized" in result:
                         try:
                             results[source].append({
                                 "line": int(line),
                                 "column": int(column),
                                 "vectorized": True,
-                                "vector_bits": 8*int(rest.split(" bytes")[0].split(" ")[-1]),
+                                "vector_bits": 8*int(rest.split(" byte")[0].split(" ")[-1]),
                                 "reason": None,
                             })
                         except Exception as e:
