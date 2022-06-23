@@ -7,27 +7,27 @@ if __name__ == '__main__':
     # e.add_run(BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
     # e.do_run()
     #
-    e = Experiment(name="MINIAPPS-CUSTOM-PLAIN")
-    e.add_run(BaseRun(app=App.ISSM_CUSTOM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
-    e.add_run(BaseRun(app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e = Experiment(name="MINIAPPS-CUSTOM-PLAIN")
+    # e.add_run(BaseRun(app=App.ISSM_CUSTOM_MINIAPP_THERMAL, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e.add_run(BaseRun(app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, own_build=True, cleanup_build=True))
+    # e.do_run()
+    #
+    e = Experiment(name="CACHEGRIND_WO_ARGS")
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, append_args=False, own_build=True, cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, append_args=False, own_build=True, cleanup_build=True))
     e.do_run()
-    #
-    # e = Experiment(name="CACHEGRIND_WO_ARGS")
-    # e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, append_args=False, own_build=True, cleanup_build=True))
-    # e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, append_args=False, own_build=True, cleanup_build=True))
-    # e.do_run()
-    #
-    # e = Experiment(name="CACHEGRIND_W_ARGS")
-    # e.add_run(
-    #     CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000,
-    #                   append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000, ll_associativity=2, ll_line=64,
-    #                   own_build=True, cleanup_build=True))
-    # e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000,
-    #                         append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000, ll_associativity=2,
-    #                         ll_line=64,
-    #                         own_build=True,
-    #                         cleanup_build=True))
-    # e.do_run()
+
+    e = Experiment(name="CACHEGRIND_W_ARGS")
+    e.add_run(
+        CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000,
+                      append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000, ll_associativity=2, ll_line=64,
+                      own_build=True, cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000,
+                            append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000, ll_associativity=2,
+                            ll_line=64,
+                            own_build=True,
+                            cleanup_build=True))
+    e.do_run()
     #
     # e = Experiment(name="SCORE-P-REGIONS")
     # e.add_run(ScorePRun(app=App.ISSM_ANNOTATED_MINIAPP_THERMAL, resolution=Resolution.G16000,
@@ -131,17 +131,17 @@ if __name__ == '__main__':
     # ))
     # e.do_run()
 
-    e = Experiment(name="MPI-SCALE-TEST")
-    i = 3
-    while i <= 96:
-        e.add_run(
-            MPIRun(app=App.ISSM_MINIAPP_THERMAL,
-                   resolution=Resolution.G16000,
-                   num_mpi_ranks=i)
-        )
-        i = i * 2
-    e.do_run()
-
-    print("FINISHED!!!!!")
+    # e = Experiment(name="MPI-SCALE-TEST")
+    # i = 3
+    # while i <= 96:
+    #     e.add_run(
+    #         MPIRun(app=App.ISSM_MINIAPP_THERMAL,
+    #                resolution=Resolution.G16000,
+    #                num_mpi_ranks=i)
+    #     )
+    #     i = i * 2
+    # e.do_run()
+    #
+    # print("FINISHED!!!!!")
 
 
