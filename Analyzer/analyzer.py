@@ -397,10 +397,12 @@ class ResultAnalyzer:
                     all_equal = False
         self.results["environment"] = {}
         self.results["environment"]["is_static"] = all_equal
-        try:
-            self.results["environment"]["static_environment"] = all_configs[0].as_dict()
-        except IndexError:
-            self.results["environment"]["static_environment"] = None
+        if all_equal:
+            # only add environment if its static
+            try:
+                self.results["environment"]["static_environment"] = all_configs[0].as_dict()
+            except IndexError:
+                self.results["environment"]["static_environment"] = None
         self.results["jobs"] = {}
         self.results["results"] = {}
         # TODO compare result data?
@@ -737,7 +739,7 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
     """
 
     def __init__(self, job_id: int, all: ExperimentConfig = None, opt: ExperimentConfig = None,
-                 miss: ExperimentConfig = None):
+                 miss: ExperimentConfig = None, limit_to="src/c"):
         """
         Constructor.
         """
@@ -745,6 +747,7 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         self.all_cnf = all
         self.opt_cnf = opt
         self.miss_cnf = miss
+        self.limit_to = limit_to
 
     def read_file(self, result_file) -> dict:
         with open(result_file, "r") as f:
@@ -771,28 +774,34 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
                         results[source] = []
                     if "missed" in result:
                         try:
-                            reason = rest.split(":", 1)[1]
+                            reason = rest.split(":", 1)[1][:-1]
                         except IndexError:
-                            reason = rest
+                            reason = rest[:-1]
                         try:
-                            results[source].append({
+                            res = {
                                 "line": int(line),
                                 "column": int(column),
                                 "vectorized": False,
                                 "vector_bits": None,
                                 "reason": reason
-                            })
+                            }
+                            if res not in results[source]:
+                                if (self.limit_to and self.limit_to in source) or not self.limit_to:
+                                    results[source].append(res)
                         except Exception as e:
                             print("Something went wrong reading CVR report: ", e,"::", type(e))
                     elif "optimized" in result:
                         try:
-                            results[source].append({
+                            res = {
                                 "line": int(line),
                                 "column": int(column),
                                 "vectorized": True,
                                 "vector_bits": 8*int(rest.split(" byte")[0].split(" ")[-1]),
                                 "reason": None,
-                            })
+                            }
+                            if res not in results[source]:
+                                if (self.limit_to and self.limit_to in source) or not self.limit_to:
+                                    results[source].append(res)
                         except Exception as e:
                             print("Something went wrong reading CVR report: ", e)
                     else:
