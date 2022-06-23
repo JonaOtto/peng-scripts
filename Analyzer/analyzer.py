@@ -833,7 +833,7 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
         elif self.opt_cnf and self.miss_cnf:
             results = self.read_file(self.opt_cnf.result_file)
             results.update(self.read_file(self.miss_cnf.result_file))
-        return self.job_id, configs, results
+        return self.job_id, configs, {"compiler_vectorization": results}
 
 
 class CallgrindAnalyzer(BaseAnalyzer):

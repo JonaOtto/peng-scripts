@@ -42,52 +42,52 @@ if __name__ == '__main__':
     # e.do_run()
     #
     #
-    # r = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
+    # e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
     # # gprof miniapps
-    # r.add_run(GProfRun(
+    # e.add_run(GProfRun(
     #     app=App.ISSM_MINIAPP_THERMAL,
     #     resolution=Resolution.G16000,
     #     own_build=True,
     #     cleanup_build=True,
     # ))
-    # r.add_run(GProfRun(
+    # e.add_run(GProfRun(
     #     app=App.ISSM_MINIAPP_STRESSBALANCE,
     #     resolution=Resolution.G16000,
     #     own_build=True,
     #     cleanup_build=True
     # ))
-    # r.do_run()
+    # e.do_run()
 
-    e = Experiment(name="VEC_REPORT_MINIAPPS")
-    e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.do_run()
-
-    e = Experiment(name="VEC_REPORT_MINIAPPS_CUSTOM")
-    e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_CUSTOM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.add_run(CompilerVectorizationReportRun(
-        app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.do_run()
-    e.do_run()
+    # e = Experiment(name="VEC_REPORT_MINIAPPS")
+    # e.add_run(CompilerVectorizationReportRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.add_run(CompilerVectorizationReportRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.do_run()
+    #
+    # e = Experiment(name="VEC_REPORT_MINIAPPS_CUSTOM")
+    # e.add_run(CompilerVectorizationReportRun(
+    #     app=App.ISSM_CUSTOM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.add_run(CompilerVectorizationReportRun(
+    #     app=App.ISSM_CUSTOM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.do_run()
+    # e.do_run()
 
     # e = Experiment(name="SCORE-P-RUNS")
     # e.add_run(ScorePRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000))
@@ -97,50 +97,50 @@ if __name__ == '__main__':
 
 
 
-    # r = Experiment(name="CALLGRIND-G16000")
-    # r.add_run(CallgrindRun(
+    # e = Experiment(name="CALLGRIND-G16000")
+    # e.add_run(CallgrindRun(
     #     app=App.ISSM_MINIAPP_THERMAL,
     #     resolution=Resolution.G16000,
     # ))
-    # r.add_run(CallgrindRun(
+    # e.add_run(CallgrindRun(
     #     app=App.ISSM_MINIAPP_THERMAL,
     #     resolution=Resolution.G16000,
     #     cache_sim=True,
     # ))
-    # r.add_run(CallgrindRun(
+    # e.add_run(CallgrindRun(
     #     app=App.ISSM_MINIAPP_THERMAL,
     #     resolution=Resolution.G16000,
     #     branch_sim=True,
     # ))
-    # r.do_run()
+    # e.do_run()
     #
-    # r = Experiment(name="CALLGRIND-G16000")
-    # r.add_run(CallgrindRun(
+    # e = Experiment(name="CALLGRIND-G16000")
+    # e.add_run(CallgrindRun(
     #     app=App.ISSM_MINIAPP_STRESSBALANCE,
     #     resolution=Resolution.G16000,
     # ))
-    # r.add_run(CallgrindRun(
+    # e.add_run(CallgrindRun(
     #     app=App.ISSM_MINIAPP_STRESSBALANCE,
     #     resolution=Resolution.G16000,
     #     cache_sim=True,
     # ))
-    # r.add_run(CallgrindRun(
+    # e.add_run(CallgrindRun(
     #     app=App.ISSM_MINIAPP_STRESSBALANCE,
     #     resolution=Resolution.G16000,
     #     branch_sim=True,
     # ))
-    # r.do_run()
+    # e.do_run()
 
-    r = Experiment(name="MPI-SCALE-TEST")
+    e = Experiment(name="MPI-SCALE-TEST")
     i = 3
     while i <= 96:
-        r.add_run(
+        e.add_run(
             MPIRun(app=App.ISSM_MINIAPP_THERMAL,
                    resolution=Resolution.G16000,
                    num_mpi_ranks=i)
         )
         i = i * 2
-    r.do_run()
+    e.do_run()
 
     print("FINISHED!!!!!")
 
