@@ -17,6 +17,7 @@ class MPIComparator:
         for cores, results in self.intermediate_res:
             if (cores, results) == self.intermediate_res[0]:
                 # first is baseline. Optimal this should be a result with one core
+                print(results)
                 self.results["mpi_compare"][str(cores)] = {"calculation_time": results["calculation_time"]}
             else:
                 # Speedup = time(1 core)/time(p processors)
