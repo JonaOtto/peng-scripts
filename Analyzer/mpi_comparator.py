@@ -26,9 +26,12 @@ class MPIComparator:
                 # Speedup = time(1 core)/time(p processors)
                 try:
                     speedup = results["calculation_time"]/self.intermediate_res[0][1]["calculation_time"]
+                    self.results["mpi_compare"][str(cores)] = {"calculation_time": results["calculation_time"],
+                                                               "speedup_to_first": speedup}
                 except KeyError:
                     speedup = None
-                self.results["mpi_compare"][str(cores)] = {"calculation_time": results["calculation_time"], "speedup_to_first": speedup}
+                    self.results["mpi_compare"][str(cores)] = {"calculation_time": None,
+                                                               "speedup_to_first": speedup}
         self.results["mpi_compare"]["average"] = sum([ct[1]["calculation_time"] for ct in self.intermediate_res])/len(self.intermediate_res)
 
     def export_graph(self):
