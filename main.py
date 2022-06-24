@@ -131,22 +131,55 @@ if __name__ == '__main__':
     # ))
     # e.do_run()
 
-    e = Experiment(name="One core!")
+    e = Experiment(name="ONE-CORE")
     e.add_run(BaseRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G16000, num_mpi_ranks=1))
     e.add_run(BaseRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G16000, num_mpi_ranks=1))
     e.add_run(BaseRun(app=App.ISSM_4_18, resolution=Resolution.G16000, num_mpi_ranks=1))
     e.do_run()
 
-    # e = Experiment(name="MPI-SCALE-TEST")
-    # i = 3
-    # while i <= 96:
-    #     e.add_run(
-    #         MPIRun(app=App.ISSM_MINIAPP_THERMAL,
-    #                resolution=Resolution.G4000,
-    #                num_mpi_ranks=i)
-    #     )
-    #     i = i * 2
-    # e.do_run()
+    e = Experiment(name="MPI-SCALE-TEST-G16000-THERMAL")
+    i = 3
+    while i <= 96:
+        e.add_run(
+            MPIRun(app=App.ISSM_MINIAPP_THERMAL,
+                   resolution=Resolution.G16000,
+                   num_mpi_ranks=i)
+        )
+        i = i * 2
+    e.do_run()
+
+    e = Experiment(name="MPI-SCALE-TEST-G4000-STRESSBALANCE")
+    i = 3
+    while i <= 96:
+        e.add_run(
+            MPIRun(app=App.ISSM_MINIAPP_STRESSBALANCE,
+                   resolution=Resolution.G4000,
+                   num_mpi_ranks=i)
+        )
+        i = i * 2
+    e.do_run()
+
+    e = Experiment(name="MPI-SCALE-TEST-G16000-THERMAL")
+    i = 3
+    while i <= 96:
+        e.add_run(
+            MPIRun(app=App.ISSM_MINIAPP_THERMAL,
+                   resolution=Resolution.G16000,
+                   num_mpi_ranks=i)
+        )
+        i = i * 2
+    e.do_run()
+
+    e = Experiment(name="MPI-SCALE-TEST-G4000-STRESSBALANCE")
+    i = 3
+    while i <= 96:
+        e.add_run(
+            MPIRun(app=App.ISSM_MINIAPP_STRESSBALANCE,
+                   resolution=Resolution.G4000,
+                   num_mpi_ranks=i)
+        )
+        i = i * 2
+    e.do_run()
 
     print("FINISHED!!!!!")
 

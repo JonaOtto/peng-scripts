@@ -18,7 +18,10 @@ class MPIComparator:
             if (cores, results) == self.intermediate_res[0]:
                 # first is baseline. Optimal this should be a result with one core
                 print(results)
-                self.results["mpi_compare"][str(cores)] = {"calculation_time": results["calculation_time"]}
+                try:
+                    self.results["mpi_compare"][str(cores)] = {"calculation_time": results["calculation_time"]}
+                except KeyError as e:
+                    print(e)
             else:
                 # Speedup = time(1 core)/time(p processors)
                 speedup = results["calculation_time"]/self.intermediate_res[0][1]["calculation_time"]

@@ -407,8 +407,8 @@ class MPIRun(BaseRun):
     """
     MPI compare run.
     """
-    def __init__(self, app: App, resolution: Resolution, *args, **kwargs):
-        super().__init__(app, resolution, *args, **kwargs, vanilla=False)
+    def __init__(self, app: App, resolution: Resolution, num_mpi_ranks=96, *args, **kwargs):
+        super().__init__(app, resolution, num_mpi_ranks=num_mpi_ranks, *args, **kwargs, vanilla=False)
         self.builder = BaseBuilder(app, source_path[app])
         self.add_tool("MPI-COMPARE")
 

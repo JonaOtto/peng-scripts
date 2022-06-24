@@ -500,7 +500,7 @@ class StdFileAnalyzer(BaseAnalyzer):
                 return False
             try:
                 self.calculation_time = float(lines[-3].split(":", 1)[1][1:-1])
-            except IndexError:
+            except Exception:
                 return False
             model_elm_sum = 0.0
             model_elm_cnt = 0.0
@@ -546,7 +546,10 @@ class StdFileAnalyzer(BaseAnalyzer):
                 if line.startswith("   FemModel initialization elapsed time"):
                     self.setup_time = float(line.split(":")[1].strip())
                 elif line.startswith("   Total Core solution elapsed time"):
-                    self.calculation_time = float(line.split(":")[1].strip())
+                    try:
+                        self.calculation_time = float(line.split(":")[1].strip())
+                    except Exception:
+                        self.calculation_time = None
                 elif line.startswith("   Total elapsed time"):
                     # : 0 hrs 0 min 47 sec
                     hours = line.split(":")[1].split(" hrs ")
