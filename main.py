@@ -192,6 +192,58 @@ if __name__ == '__main__':
     #     i = i * 2
     # e.do_run()
 
+    e = Experiment(name="CACHEGRIND_WO_ARGS")
+    e.add_run(
+        CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G4000, append_args=False, own_build=True,
+                      cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G4000, append_args=False,
+                            own_build=True, cleanup_build=True))
+    e.do_run()
+    e.do_run()
+    e.do_run()
+
+    e = Experiment(name="CACHEGRIND_W_ARGS")
+    e.add_run(
+        CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G64000,
+                      append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000,
+                      ll_associativity=2, ll_line=64,
+                      own_build=True, cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G64000,
+                            append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000,
+                            ll_associativity=2,
+                            ll_line=64,
+                            own_build=True,
+                            cleanup_build=True))
+    e.do_run()
+    e.do_run()
+    e.do_run()
+
+    e = Experiment(name="CACHEGRIND_WO_ARGS")
+    e.add_run(
+        CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G64000, append_args=False, own_build=True,
+                      cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G64000, append_args=False,
+                            own_build=True, cleanup_build=True))
+    e.do_run()
+    e.do_run()
+    e.do_run()
+
+    e = Experiment(name="CACHEGRIND_W_ARGS")
+    e.add_run(
+        CachegrindRun(app=App.ISSM_MINIAPP_THERMAL, resolution=Resolution.G4000,
+                      append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000,
+                      ll_associativity=2, ll_line=64,
+                      own_build=True, cleanup_build=True))
+    e.add_run(CachegrindRun(app=App.ISSM_MINIAPP_STRESSBALANCE, resolution=Resolution.G4000,
+                            append_args=True, l1_size=128000, l1_associativity=2, l1_line=64, ll_size=143000000,
+                            ll_associativity=2,
+                            ll_line=64,
+                            own_build=True,
+                            cleanup_build=True))
+    e.do_run()
+    e.do_run()
+    e.do_run()
+
     print("FINISHED!!!!!")
 
 
