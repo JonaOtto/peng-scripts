@@ -48,53 +48,86 @@ if __name__ == '__main__':
     #
     #
 
-    e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
-    # gprof miniapps
+    e = Experiment(name="GPROF_THERMAL")
     e.add_run(GProfRun(
         app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
         own_build=True,
-        cleanup_build=True,
+        cleanup_build=True
     ))
     e.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
+        app=App.ISSM_MINIAPP_THERMAL,
+        resolution=Resolution.G16000,
+        own_build=True,
+        cleanup_build=True
+    ))
+    e.add_run(GProfRun(
+        app=App.ISSM_MINIAPP_THERMAL,
+        resolution=Resolution.G16000,
+        own_build=True,
+        cleanup_build=True
+    ))
+    e.add_run(GProfRun(
+        app=App.ISSM_MINIAPP_THERMAL,
+        resolution=Resolution.G16000,
+        own_build=True,
+        cleanup_build=True
+    ))
+    e.add_run(GProfRun(
+        app=App.ISSM_MINIAPP_THERMAL,
         resolution=Resolution.G16000,
         own_build=True,
         cleanup_build=True
     ))
     e.do_run()
 
-    e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
-    # gprof miniapps
-    e.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True
-    ))
-    e.do_run()
-
-    e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
-    # gprof miniapps
-    e.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_THERMAL,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True,
-    ))
-    e.add_run(GProfRun(
-        app=App.ISSM_MINIAPP_STRESSBALANCE,
-        resolution=Resolution.G16000,
-        own_build=True,
-        cleanup_build=True
-    ))
-    e.do_run()
+    # e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
+    # # gprof miniapps
+    # e.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True
+    # ))
+    # e.do_run()
+    #
+    # e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
+    # # gprof miniapps
+    # e.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True
+    # ))
+    # e.do_run()
+    #
+    # e = Experiment(name="GPROF_BOTH_MINIAPPS_G16000")
+    # # gprof miniapps
+    # e.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_THERMAL,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True,
+    # ))
+    # e.add_run(GProfRun(
+    #     app=App.ISSM_MINIAPP_STRESSBALANCE,
+    #     resolution=Resolution.G16000,
+    #     own_build=True,
+    #     cleanup_build=True
+    # ))
+    # e.do_run()
 
     # e = Experiment(name="VEC_REPORT_MINIAPPS")
     # e.add_run(CompilerVectorizationReportRun(
