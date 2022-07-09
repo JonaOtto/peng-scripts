@@ -90,17 +90,9 @@ class BaseRun:
         self.out_path = f"{default_out_dir}/{self.jobname_skeleton}"
         # Slurm config
         self.slurm_configuration = None
-        # self.slurm_configuration = DefaultPEngSlurmConfig(
-        #     job_name=self.jobname_skeleton,
-        #     output_directory=default_out_dir,
-        #     job_file_directory=self.home_dir + "/" + model_setup_path[self.resolution],
-        #     num_mpi_ranks=self.num_mpi_ranks
-        # )
         # if not tool is used add "VANILLA"
         if vanilla:
             self.add_tool("VANILLA")
-        # prepend time command for wall clock real time
-        #self.prepend_run_command("/usr/bin/time -f %e")
 
     def add_tool(self, name: str):
         """
@@ -398,9 +390,6 @@ class CallgrindRun(BaseRun):
                         f"{self.out_path}/{skeleton}.callgrind-out"])
         subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}",
                         f"{self.out_path}/{skeleton}.callgrind-vgcore"])
-        # remove out files
-        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{callgrind_file}")
-        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
 
 
 class MPIRun(BaseRun):
@@ -436,15 +425,7 @@ class ScorePRun(BaseRun):
 
     """
     # Use papi_avail, to check for metrics. Remember to module load papi
-    # END ans Ende verschieben
-    # cube dump mit oder cube gui
-    # automatic load imbalance paper
-    #
-    # peak performance: mit ohne AVX: PIN intel: instruction mix
-    # mit Optimierung aus und einschalten, oder --ftree optionen wie bei CVR.
-
-    # likwid (topology) numctl, intel developer guide, performance software architecture optimaization guide
-    #
+    # may use tool "likwid" to check the hardware specs
 
     def __init__(self, app: App, resolution: Resolution, compiler_instrumentation=True, user_instrumentation=False, *args, **kwargs):
         super().__init__(app, resolution, *args, **kwargs, vanilla=False)
@@ -502,7 +483,3 @@ class CachegrindRun(BaseRun):
         skeleton = self.jobname_skeleton.split(".")[0]  # cut off job-id again
         subprocess.run(["mv", f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}",
                         f"{self.out_path}/{skeleton}.cachegrind-out"])
-        # remove out files
-        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{cachegrind_file}")
-        #os.remove(f"{self.home_dir}/{model_setup_path[self.resolution]}/{core_file}")
-

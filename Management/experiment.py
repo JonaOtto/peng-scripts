@@ -35,8 +35,8 @@ class Experiment:
             try:
                 out_dir, builder_config, job_config = run.do_run()
                 self.__run_res_tuples.append((out_dir, builder_config, job_config))
-            except Exception:
-                print("AAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHRRRRRRRRRRRRRRGGGGGGGGGGGGGGG")
+            except Exception as e:
+                print(f"Exception in run {run}, starting next one! Stack Trace: {e}")
         print(f"Starting analyzing on experiment: {self.name}")
 
         """ 
@@ -44,7 +44,7 @@ class Experiment:
         You may need to have your own definition of what "equal" is in the context of your experiment.
         You may inject a function that returns true or false and takes two ExperimentConfigs as arguments here,
         with the config_equal_f parameter. This way you can overwrite the default comparison method used otherwise,
-        which can be found in Analyzer/analyzer.py:ExperimentConfig::is_comparable(self, other)
+        which can be found in Analyzer/analyzer.py:ExperimentConfig:is_comparable(self, other)
         """
         analyzer = ResultAnalyzer(self.__run_res_tuples, config_equal_f=None)
         results = analyzer.analyze()

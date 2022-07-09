@@ -43,6 +43,7 @@ class _Module:
         :param other_modules: List of other modules to check with.
         :return: void, raises ModuleDependencyConflict exception if a conflict was detected.
         """
+        # TODO re-iterate this code, it does not work good. But we do not need such functionality here anyways... might just take it out
         if self.depends_on:
             for dependency in self.depends_on:
                 for compare_module in other_modules:

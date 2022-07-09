@@ -6,6 +6,7 @@ from SLURM.exceptions import CommandExecutionException
 
 default_out_dir = "issm-output/RESULTS"
 git_dir = "issm-output"
+use_git = False  # Turn to true if you want to use git committing and pushing
 
 
 class Exporter:
@@ -43,18 +44,15 @@ class Exporter:
         """
         commits and pushes the results in the issm-output git.
         """
-
-        return
-
-        # TODO Git not working for the moment - LFS account nearly full - needs other storage solution!
-        # print("Git status:")
-        # subprocess.run(["git", "status"])
-        # print(f"Committing: Updated results for experiment {self.experiment_name}")
-        # os.chdir(f"{self.home_dir}/{git_dir}")
-        # subprocess.run(["git", "add", "-A"])
-        # subprocess.run(["git", "commit", "-m", f"\"Updated results for experiment {self.experiment_name}.\""])
-        # print("Pushing")
-        # subprocess.run(["git", "push"])
-        # print("Finished! Updated the output git.")
-        # print("Git status:")
-        # subprocess.run(["git", "status"])
+        if use_git:
+            print("Git status:")
+            subprocess.run(["git", "status"])
+            print(f"Committing: Updated results for experiment {self.experiment_name}")
+            os.chdir(f"{self.home_dir}/{git_dir}")
+            subprocess.run(["git", "add", "-A"])
+            subprocess.run(["git", "commit", "-m", f"\"Updated results for experiment {self.experiment_name}.\""])
+            print("Pushing")
+            subprocess.run(["git", "push"])
+            print("Finished! Updated the output git.")
+            print("Git status:")
+            subprocess.run(["git", "status"])

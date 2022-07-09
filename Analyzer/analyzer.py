@@ -102,7 +102,7 @@ class ExperimentConfig:
     def is_comparable(self, other):
         """
         Check if a ExperimentConfig is comparable with another. This means everything should be equal but the
-        result_file, job_id, source_path and the compiler flags. Also, Apps and Resolution are not included in this:
+        result_file, job_id and source_path. Also, Apps and Resolution are not included in this:
         USE WITH CARE!!
         There may be cases where it is useful to have other "equal" definitions. They must be implemented on their own.
         """
@@ -331,7 +331,6 @@ class ResultAnalyzer:
                         print(this_file_exp_config.result_file)
                         self.std_files[job_id]["out"] = this_file_exp_config
                         # add file to mpi compare for later mpi compare
-                        # todo split for the apps
                         if tool == "MPI-COMPARE":
                             self.mpi_compare.update({this_file_exp_config.mpi_num_ranks: None})
                     elif extension == "err":
@@ -364,7 +363,6 @@ class ResultAnalyzer:
                     elif extension == "callgrind-vgcore":
                         self.callgrind_files[job_id]["callgrind_vgcore"] = this_file_exp_config
                 elif tool == "VANILLA":
-                    # TODO: What to do if vanilla? -> Baseline?
                     pass
                 else:
                     continue
@@ -813,7 +811,6 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
                     continue
             return results
 
-
     def analyze(self):
         print("\n\nANALYZING CVR!!")
         print(self.all_cnf)
@@ -826,10 +823,6 @@ class CompilerVectorizationReportAnalyzer(BaseAnalyzer):
             configs["opt"] = self.opt_cnf
         if self.miss_cnf:
             configs["miss"] = self.miss_cnf
-        # TODO: Actually extract the stuff from the files!
-        """
-        But for the paper in this case it was easier to just use Ctrl+F on the output files.
-        """
         results = {}
         if self.all_cnf:
             results = self.read_file(self.all_cnf.result_file)

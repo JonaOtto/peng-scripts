@@ -1,4 +1,7 @@
 """
+
+JUST SOME NOTES FOR MYSELF!
+
 Runs for Performance Engineering:
 
 ### Compiler Vectorization Report ###
@@ -14,7 +17,7 @@ unsuccessful: -fopt-info-vec-missed=vec.miss
 or all: -fopt-info-vec-all=vec.all
 Result:
 The file that will be piped in holds some information about the code lines with loops,
-and states if they where vectorized or not.
+and states if they were vectorized or not.
 Note: There is the same thing for the intel compilers, which we do not use.
 
 ### GProf ###

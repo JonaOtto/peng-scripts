@@ -249,7 +249,6 @@ class CompilerVectorizationReportBuilder(BaseBuilder):
                 additional_compiler_flags += f"-fopt-info-vec-all={self.path_all}"
             additional_gf_flags = "-O3 -march=native"
         else:
-            # TODO: put correct intel compiler flags
             if not self.do_not_export_single_files:
                 additional_compiler_flags += f"-fopt-info-vec-optimized={self.path_successful} -fopt-info-vec-missed={self.path_unsuccessful}"
             if self.path_all:
